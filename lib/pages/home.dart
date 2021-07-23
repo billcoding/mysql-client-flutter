@@ -1,29 +1,38 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.title}) : super(key: key);
-  final String title;
+  HomePage({
+    Key key,
+  }) : super(key: key);
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(
-            child: Text(
-          widget.title,
-        )),
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(
+          'MySQL Client',
+          style: TextStyle(color: Colors.black),
+        ),
+        trailing: GestureDetector(
+          child: Icon(Icons.add),
+          onTap: () {
+            Navigator.pushNamed(context, '/connection/add');
+          },
+        ),
+        backgroundColor: Colors.white,
       ),
-      body: Center(
-        child: Text('Hello world!!!'),
-      ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Setting',
-        child: Icon(Icons.add),
-        onPressed: () {},
+      child: Center(
+        child: Text('Connections'),
       ),
     );
   }
