@@ -25,9 +25,7 @@ class _HomePageState extends State<HomePage> {
         ),
         trailing: GestureDetector(
           child: Icon(Icons.add),
-          onTap: () {
-            Navigator.pushNamed(context, '/connection/add');
-          },
+          onTap: () => Navigator.pushNamed(context, '/connections/add'),
         ),
         backgroundColor: Colors.white,
       ),
