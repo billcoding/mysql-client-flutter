@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
         ),
         leading: GestureDetector(
           child: Icon(Icons.refresh),
-          onTap: () async => this.initState(),
+          onTap: () async => refreshConnections(),
         ),
         trailing: GestureDetector(
           child: Icon(Icons.add),
