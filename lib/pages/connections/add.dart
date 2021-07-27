@@ -10,22 +10,29 @@ import 'package:mysql_client_flutter/util/widget.dart';
 import 'package:sp_util/sp_util.dart';
 
 class AddPage extends StatefulWidget {
-  AddPage({Key key}) : super(key: key);
+  final Connection conn;
+  AddPage({Key key, this.conn}) : super(key: key);
   @override
-  _AddPageState createState() => _AddPageState();
+  _AddPageState createState() => _AddPageState(this.conn);
 }
 
 class _AddPageState extends State<AddPage> {
+  final Connection conn;
+  final bool edit;
+  _AddPageState(this.conn) : edit = conn != null;
   @override
   void initState() {
     super.initState();
-    _portController = TextEditingController(text: '3310');
-    _hostController = TextEditingController(text: '192.168.0.252');
-    _userController = TextEditingController(text: 'root');
-    _passwordController =
-        TextEditingController(text: 'oGMyxw4auP6F6Sn1ENxMVTa1kCc=');
-    _databaseController = TextEditingController(text: 'test');
-    _aliasController = TextEditingController(text: 'connection1');
+    _hostController =
+        TextEditingController(text: edit ? conn.host : '192.168.0.252');
+    _portController = TextEditingController(text: edit ? conn.port : '3310');
+    _userController = TextEditingController(text: edit ? conn.user : 'root');
+    _passwordController = TextEditingController(
+        text: edit ? conn.password : 'oGMyxw4auP6F6Sn1ENxMVTa1kCc=');
+    _databaseController =
+        TextEditingController(text: edit ? conn.database : 'test');
+    _aliasController =
+        TextEditingController(text: edit ? conn.alias : 'connection1');
   }
 
   @override
@@ -162,6 +169,6 @@ class _AddPageState extends State<AddPage> {
       SpUtil.putObjectList(Keys.connections, [conn]);
     }
     showToast(context, 'Save success!!!');
-    // Timer(Duration(seconds: 1), () => Navigator.of(context).pop());
+    Timer(Duration(seconds: 1), () => Navigator.of(context).pop());
   }
 }

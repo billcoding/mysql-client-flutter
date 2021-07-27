@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
+import 'package:mysql_client_flutter/pages/connections/add.dart';
 import 'package:mysql_client_flutter/strings/keys.dart';
-import 'package:mysql_client_flutter/util/widget.dart';
 import 'package:sp_util/sp_util.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,9 +17,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        loadSavedConnections();
-      });
+      refreshConnections();
     });
     super.initState();
   }
@@ -63,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                 fit: BoxFit.fill,
               ))),
           Expanded(
-              flex: 2,
+              flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -86,10 +84,22 @@ class _HomePageState extends State<HomePage> {
             child: CupertinoButton(
               padding: EdgeInsets.only(right: 10),
               child: Icon(
-                Icons.settings,
-                size: 36,
+                Icons.edit,
+                size: 30,
               ),
               onPressed: () async => editConnection(context, index),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: CupertinoButton(
+              padding: EdgeInsets.only(right: 10),
+              child: Icon(
+                Icons.delete,
+                size: 30,
+                color: Colors.redAccent,
+              ),
+              onPressed: () async => removeConnection(context, index),
             ),
           ),
         ]));
@@ -97,16 +107,24 @@ class _HomePageState extends State<HomePage> {
 
   List<Connection> _connections = <Connection>[];
 
-  Future<void> loadSavedConnections() async {
-    var conns =
-        SpUtil.getObjList(Keys.connections, (map) => Connection.fromJson(map));
-    showToast(context, 'conns => $conns');
-    _connections.clear();
-    _connections.addAll(conns);
+  Future<void> refreshConnections() async {
+    setState(() {
+      var conns = SpUtil.getObjList(
+          Keys.connections, (map) => Connection.fromJson(map));
+      _connections.clear();
+      _connections.addAll(conns);
+    });
   }
 
   Future editConnection(BuildContext context, int index) async {
-    Navigator.of(context)
-        .pushNamed('/connections/add', arguments: _connections[index]);
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      return AddPage(conn: _connections[index]);
+    }));
+  }
+
+  Future removeConnection(BuildContext context, int index) async {
+    _connections.removeAt(index);
+    SpUtil.putObjectList(Keys.connections, _connections);
+    refreshConnections();
   }
 }
