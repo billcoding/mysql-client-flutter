@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:mysql_client_flutter/model/connection.dart';
+import 'package:mysql_client_flutter/strings/keys.dart';
 import 'package:mysql_client_flutter/util/widget.dart';
+import 'package:sp_util/sp_util.dart';
 
 class AddPage extends StatefulWidget {
-  AddPage({Key key, this.title}) : super(key: key);
-  final String title;
+  AddPage({Key key}) : super(key: key);
   @override
   _AddPageState createState() => _AddPageState();
 }
@@ -37,6 +41,7 @@ class _AddPageState extends State<AddPage> {
               'Save',
               style: TextStyle(color: Colors.blue),
             ),
+            onTap: () async => save(context),
           ),
         ),
         backgroundColor: Colors.grey[200],
@@ -57,14 +62,23 @@ class _AddPageState extends State<AddPage> {
                 buildCupertinoFormSection('OTHER', [
                   buildTextField('Alias', _aliasController),
                 ]),
-                buildCupertinoFormSection('OTHER', [
-                  buildTextField('Alias', _aliasController),
-                ]),
                 buildCupertinoFormSection('ACTIONS', [
-                  CupertinoButton(child: Text('Save'), onPressed: () {}),
+                  CupertinoButton(
+                      child: Text('Save'),
+                      onPressed: () async => await save(context)),
                   CupertinoButton(
                     child: Text('Test Connection'),
-                    onPressed: () async => await testConnection(context),
+                    onPressed: () async => await test(context),
+                  ),
+                  CupertinoButton(
+                    child: Text('Clear Connections'),
+                    onPressed: () async =>
+                        await SpUtil.remove(Keys.connections),
+                  ),
+                  CupertinoButton(
+                    child: Text('Get Connections'),
+                    onPressed: () async => await showToast(
+                        context, '${SpUtil.getObjectList(Keys.connections)}'),
                   ),
                 ]),
               ],
@@ -90,7 +104,7 @@ class _AddPageState extends State<AddPage> {
           flex: 4,
           child: Container(
             child: Text(text),
-            padding: EdgeInsets.only(top: 10, bottom: 10, left: 20),
+            padding: EdgeInsets.only(top: 12, bottom: 12, left: 20),
           ),
         ),
         Expanded(
@@ -115,20 +129,39 @@ class _AddPageState extends State<AddPage> {
   TextEditingController _databaseController;
   TextEditingController _aliasController;
 
-  Future<void> testConnection(BuildContext context) async {
-    final conn = await MySqlConnection.connect(ConnectionSettings(
+  Future<void> test(BuildContext context) async {
+    MySqlConnection.connect(ConnectionSettings(
       host: _hostController.text,
       port: int.parse(_portController.text),
       user: _userController.text,
       db: _databaseController.text,
       password: _passwordController.text,
-    )).onError((error, stackTrace) => showCupertinoDialog(
-        context: context,
-        builder: (context) => Text('Error: $error'),
-        barrierDismissible: true));
-    var results = await conn.query('select now() as t');
-    var nowTime = await results.first['t'];
-    showToast(context, 'Server now: $nowTime');
-    Navigator.of(context).pop();
+    )).then((conn) async {
+      var results = await conn.query('select "PING OK" as t');
+      var nowTime = await results.first['t'];
+      showToast(context, 'Server: $nowTime');
+    }).onError((error, stackTrace) {
+      showToast(context, 'Error: $error');
+    });
+  }
+
+  Future<void> save(BuildContext context) async {
+    String host = _hostController.text;
+    String port = _portController.text;
+    String user = _userController.text;
+    String password = _passwordController.text;
+    String database = _databaseController.text;
+    String alias = _aliasController.text;
+    var conn = Connection(host, port, user, password, database, alias);
+    if (SpUtil.containsKey(Keys.connections)) {
+      var conns = SpUtil.getObjList(
+          Keys.connections, (map) => Connection.fromJson(map));
+      conns.add(conn);
+      SpUtil.putObjectList(Keys.connections, conns);
+    } else {
+      SpUtil.putObjectList(Keys.connections, [conn]);
+    }
+    showToast(context, 'Save success!!!');
+    // Timer(Duration(seconds: 1), () => Navigator.of(context).pop());
   }
 }

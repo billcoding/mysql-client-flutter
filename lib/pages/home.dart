@@ -1,5 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mysql_client_flutter/model/connection.dart';
+import 'package:mysql_client_flutter/strings/keys.dart';
+import 'package:mysql_client_flutter/util/widget.dart';
+import 'package:sp_util/sp_util.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({
@@ -12,26 +16,97 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() {
+        loadSavedConnections();
+      });
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      backgroundColor: Colors.grey[200],
       navigationBar: CupertinoNavigationBar(
         middle: Text(
           'MySQL Client',
           style: TextStyle(color: Colors.black),
         ),
+        leading: GestureDetector(
+          child: Icon(Icons.refresh),
+          onTap: () async => this.initState(),
+        ),
         trailing: GestureDetector(
           child: Icon(Icons.add),
-          onTap: () => Navigator.pushNamed(context, '/connections/add'),
+          onTap: () async =>
+              Navigator.of(context).pushNamed('/connections/add'),
         ),
-        backgroundColor: Colors.white,
       ),
-      child: Center(
-        child: Text('Connections'),
+      child: ListView.builder(
+        itemCount: _connections.length,
+        itemBuilder: (context, index) =>
+            buildListViewItem(context, _connections[index], index),
       ),
     );
+  }
+
+  Widget buildListViewItem(BuildContext context, Connection conn, int index) {
+    return Container(
+        padding: EdgeInsets.only(left: 20, top: 10),
+        child: Row(children: [
+          Expanded(
+              flex: 1,
+              child: Container(
+                  child: Image(
+                image: AssetImage('assets/images/mysql.png'),
+                fit: BoxFit.fill,
+              ))),
+          Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${conn.alias}',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    '${conn.host}',
+                  ),
+                ],
+              )),
+          Expanded(
+            flex: 3,
+            child: Text(''),
+          ),
+          Expanded(
+            flex: 1,
+            child: CupertinoButton(
+              padding: EdgeInsets.only(right: 10),
+              child: Icon(
+                Icons.settings,
+                size: 36,
+              ),
+              onPressed: () async => editConnection(context, index),
+            ),
+          ),
+        ]));
+  }
+
+  List<Connection> _connections = <Connection>[];
+
+  Future<void> loadSavedConnections() async {
+    var conns =
+        SpUtil.getObjList(Keys.connections, (map) => Connection.fromJson(map));
+    showToast(context, 'conns => $conns');
+    _connections.clear();
+    _connections.addAll(conns);
+  }
+
+  Future editConnection(BuildContext context, int index) async {
+    Navigator.of(context)
+        .pushNamed('/connections/add', arguments: _connections[index]);
   }
 }
