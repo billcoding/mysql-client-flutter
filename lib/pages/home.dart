@@ -38,7 +38,9 @@ class _HomePageState extends State<HomePage> {
         trailing: GestureDetector(
           child: Icon(Icons.add),
           onTap: () async =>
-              Navigator.of(context).pushNamed('/connections/add'),
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return AddPage();
+          })).then((value) async => refreshConnections()),
         ),
       ),
       child: ListView.builder(

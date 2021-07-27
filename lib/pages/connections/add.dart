@@ -11,15 +11,17 @@ import 'package:sp_util/sp_util.dart';
 
 class AddPage extends StatefulWidget {
   final Connection conn;
-  AddPage({Key key, this.conn}) : super(key: key);
+  final int index;
+  AddPage({Key key, this.conn, this.index}) : super(key: key);
   @override
-  _AddPageState createState() => _AddPageState(this.conn);
+  _AddPageState createState() => _AddPageState(this.conn, this.index);
 }
 
 class _AddPageState extends State<AddPage> {
   final Connection conn;
+  final int index;
   final bool edit;
-  _AddPageState(this.conn) : edit = conn != null;
+  _AddPageState(this.conn, this.index) : edit = conn != null;
   @override
   void initState() {
     super.initState();
@@ -163,7 +165,11 @@ class _AddPageState extends State<AddPage> {
     if (SpUtil.containsKey(Keys.connections)) {
       var conns = SpUtil.getObjList(
           Keys.connections, (map) => Connection.fromJson(map));
-      conns.add(conn);
+      if (!edit) {
+        conns.add(conn);
+      } else {
+        conns[index] = conn;
+      }
       SpUtil.putObjectList(Keys.connections, conns);
     } else {
       SpUtil.putObjectList(Keys.connections, [conn]);
