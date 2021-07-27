@@ -79,16 +79,6 @@ class _AddPageState extends State<AddPage> {
                     child: Text('Test Connection'),
                     onPressed: () async => await test(context),
                   ),
-                  CupertinoButton(
-                    child: Text('Clear Connections'),
-                    onPressed: () async =>
-                        await SpUtil.remove(Keys.connections),
-                  ),
-                  CupertinoButton(
-                    child: Text('Get Connections'),
-                    onPressed: () async => await showToast(
-                        context, '${SpUtil.getObjectList(Keys.connections)}'),
-                  ),
                 ]),
               ],
             ),
@@ -174,7 +164,8 @@ class _AddPageState extends State<AddPage> {
     } else {
       SpUtil.putObjectList(Keys.connections, [conn]);
     }
-    showToast(context, 'Save success!!!');
+    showToast(context, 'Save success');
     Timer(Duration(seconds: 1), () => Navigator.of(context).pop());
+    conn = null;
   }
 }

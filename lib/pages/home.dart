@@ -120,8 +120,11 @@ class _HomePageState extends State<HomePage> {
 
   Future editConnection(BuildContext context, int index) async {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return AddPage(conn: _connections[index]);
-    }));
+      return AddPage(
+        conn: _connections[index],
+        index: index,
+      );
+    })).then((value) => refreshConnections());
   }
 
   Future removeConnection(BuildContext context, int index) async {
