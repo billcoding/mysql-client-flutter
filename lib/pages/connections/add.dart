@@ -6,35 +6,46 @@ import 'package:flutter/services.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
 import 'package:mysql_client_flutter/strings/keys.dart';
-import 'package:mysql_client_flutter/util/widget.dart';
+import 'package:mysql_client_flutter/util/toast.dart';
 import 'package:sp_util/sp_util.dart';
 
 class AddPage extends StatefulWidget {
   final Connection conn;
   final int index;
-  AddPage({Key key, this.conn, this.index}) : super(key: key);
+  final bool edit;
+  AddPage({Key key, this.conn, this.index, this.edit = false})
+      : super(key: key);
   @override
-  _AddPageState createState() => _AddPageState(this.conn, this.index);
+  _AddPageState createState() =>
+      _AddPageState(this.conn, this.index, this.edit);
 }
 
 class _AddPageState extends State<AddPage> {
   final Connection conn;
   final int index;
   final bool edit;
-  _AddPageState(this.conn, this.index) : edit = conn != null;
+  TextEditingController _portController;
+  TextEditingController _hostController;
+  TextEditingController _userController;
+  TextEditingController _passwordController;
+  TextEditingController _databaseController;
+  TextEditingController _aliasController;
+  ScrollController _scrollController;
+  bool _saveEnabled = true;
+  bool _testEnabled = true;
+  GlobalKey<FormState> _formKey = GlobalKey();
+
+  _AddPageState(this.conn, this.index, this.edit);
+
   @override
   void initState() {
     super.initState();
-    _hostController =
-        TextEditingController(text: edit ? conn.host : '192.168.0.252');
-    _portController = TextEditingController(text: edit ? conn.port : '3310');
-    _userController = TextEditingController(text: edit ? conn.user : 'root');
-    _passwordController = TextEditingController(
-        text: edit ? conn.password : 'oGMyxw4auP6F6Sn1ENxMVTa1kCc=');
-    _databaseController =
-        TextEditingController(text: edit ? conn.database : 'test');
-    _aliasController =
-        TextEditingController(text: edit ? conn.alias : 'connection1');
+    _hostController = TextEditingController(text: conn?.host);
+    _portController = TextEditingController(text: conn?.port);
+    _userController = TextEditingController(text: conn?.user);
+    _passwordController = TextEditingController(text: conn?.password);
+    _databaseController = TextEditingController(text: conn?.database);
+    _aliasController = TextEditingController(text: conn?.alias);
   }
 
   @override
@@ -50,40 +61,49 @@ class _AddPageState extends State<AddPage> {
               'Save',
               style: TextStyle(color: Colors.blue),
             ),
-            onTap: () async => save(context),
+            onTap: () async => _saveEnabled ? save(context) : null,
           ),
         ),
         backgroundColor: Colors.grey[200],
         child: SafeArea(
-            child: ListView(
-          children: [
-            CupertinoFormSection(
-              children: [
+            child: ListView(controller: _scrollController, children: [
+          Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.always,
+              onChanged: () {
+                Form.of(primaryFocus.context).save();
+              },
+              child: CupertinoFormSection(children: [
                 buildCupertinoFormSection('CONNECTION', [
-                  buildTextField('Host/IP', _hostController),
+                  buildTextField('Host/IP', _hostController,
+                      placeholder: "localhost"),
                   buildTextField('Port', _portController,
-                      keyboardType: TextInputType.number),
-                  buildTextField('User', _userController),
+                      keyboardType: TextInputType.number,
+                      placeholder: "3306",
+                      maxLength: 5),
+                  buildTextField('User', _userController, placeholder: "root"),
                   buildTextField('Password', _passwordController,
-                      obscureText: true),
-                  buildTextField('Datebase', _databaseController),
+                      password: true, placeholder: "password"),
+                  buildTextField('Datebase', _databaseController,
+                      placeholder: "test"),
                 ]),
                 buildCupertinoFormSection('OTHER', [
-                  buildTextField('Alias', _aliasController),
+                  buildTextField('Alias', _aliasController,
+                      placeholder: "some-connection", maxLength: 20),
                 ]),
                 buildCupertinoFormSection('ACTIONS', [
                   CupertinoButton(
                       child: Text('Save'),
-                      onPressed: () async => await save(context)),
+                      onPressed: () async => await Future.value(
+                          _saveEnabled ? save(context) : null)),
                   CupertinoButton(
                     child: Text('Test Connection'),
-                    onPressed: () async => await test(context),
+                    onPressed: () async =>
+                        await Future.value(_testEnabled ? test(context) : null),
                   ),
                 ]),
-              ],
-            ),
-          ],
-        )));
+              ]))
+        ])));
   }
 
   CupertinoFormSection buildCupertinoFormSection(
@@ -95,56 +115,56 @@ class _AddPageState extends State<AddPage> {
   }
 
   Widget buildTextField(String text, TextEditingController controller,
-      {bool obscureText = false,
-      TextInputType keyboardType = TextInputType.text}) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 4,
-          child: Container(
-            child: Text(text),
-            padding: EdgeInsets.only(top: 12, bottom: 12, left: 20),
-          ),
-        ),
-        Expanded(
-            flex: 6,
-            child: Container(
-              child: CupertinoTextField(
-                obscureText: obscureText,
-                keyboardType: keyboardType,
-                textAlign: TextAlign.right,
-                controller: controller,
-                decoration: null,
-              ),
-            )),
-      ],
+      {bool password = false,
+      TextInputType keyboardType = TextInputType.text,
+      int maxLength = 50,
+      String placeholder}) {
+    return CupertinoTextFormFieldRow(
+      prefix: Text(text),
+      obscureText: password,
+      keyboardType: keyboardType,
+      textAlign: TextAlign.right,
+      controller: controller,
+      maxLength: maxLength,
+      maxLines: 1,
+      decoration: null,
+      placeholder: placeholder,
+      validator: (String value) {
+        return value.isEmpty ? 'Please enter this field.' : null;
+      },
     );
   }
 
-  TextEditingController _portController;
-  TextEditingController _hostController;
-  TextEditingController _userController;
-  TextEditingController _passwordController;
-  TextEditingController _databaseController;
-  TextEditingController _aliasController;
-
   Future<void> test(BuildContext context) async {
+    _testEnabled = false;
+    if (!_formKey.currentState.validate()) {
+      _testEnabled = true;
+      return;
+    }
     MySqlConnection.connect(ConnectionSettings(
       host: _hostController.text,
       port: int.parse(_portController.text),
       user: _userController.text,
       db: _databaseController.text,
       password: _passwordController.text,
+      timeout: Duration(seconds: 1),
     )).then((conn) async {
       var results = await conn.query('select "PING OK" as t');
       var nowTime = await results.first['t'];
       showToast(context, 'Server: $nowTime');
+      _testEnabled = true;
     }).onError((error, stackTrace) {
-      showToast(context, 'Error: $error');
+      showToast(context, 'Error: fail');
+      _testEnabled = true;
     });
   }
 
   Future<void> save(BuildContext context) async {
+    _saveEnabled = false;
+    if (!_formKey.currentState.validate()) {
+      _saveEnabled = true;
+      return;
+    }
     String host = _hostController.text;
     String port = _portController.text;
     String user = _userController.text;
@@ -155,17 +175,18 @@ class _AddPageState extends State<AddPage> {
     if (SpUtil.containsKey(Keys.connections)) {
       var conns = SpUtil.getObjList(
           Keys.connections, (map) => Connection.fromJson(map));
-      if (!edit) {
-        conns.add(conn);
-      } else {
+      if (edit) {
+        // edit
         conns[index] = conn;
+      } else {
+        conns.add(conn);
       }
       SpUtil.putObjectList(Keys.connections, conns);
     } else {
       SpUtil.putObjectList(Keys.connections, [conn]);
     }
     showToast(context, 'Save success');
-    Timer(Duration(seconds: 1), () => Navigator.of(context).pop());
-    conn = null;
+    _saveEnabled = true;
+    Navigator.of(context).pop();
   }
 }
