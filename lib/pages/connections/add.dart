@@ -1,9 +1,7 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mysql1/mysql1.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
 import 'package:mysql_client_flutter/strings/keys.dart';
 import 'package:mysql_client_flutter/util/toast.dart';
@@ -73,7 +71,7 @@ class _AddPageState extends State<AddPage> {
               onChanged: () {
                 Form.of(primaryFocus.context).save();
               },
-              child: CupertinoFormSection(children: [
+              child: Column(children: [
                 buildCupertinoFormSection('CONNECTION', [
                   buildTextField('Host/IP', _hostController,
                       placeholder: "localhost"),
@@ -141,14 +139,7 @@ class _AddPageState extends State<AddPage> {
       _testEnabled = true;
       return;
     }
-    MySqlConnection.connect(ConnectionSettings(
-      host: _hostController.text,
-      port: int.parse(_portController.text),
-      user: _userController.text,
-      db: _databaseController.text,
-      password: _passwordController.text,
-      timeout: Duration(seconds: 1),
-    )).then((conn) async {
+    createConnection().connect().then((conn) async {
       var results = await conn.query('select "PING OK" as t');
       var nowTime = await results.first['t'];
       showToast(context, 'Server: $nowTime');
@@ -165,13 +156,7 @@ class _AddPageState extends State<AddPage> {
       _saveEnabled = true;
       return;
     }
-    String host = _hostController.text;
-    String port = _portController.text;
-    String user = _userController.text;
-    String password = _passwordController.text;
-    String database = _databaseController.text;
-    String alias = _aliasController.text;
-    var conn = Connection(host, port, user, password, database, alias);
+    var conn = createConnection();
     if (SpUtil.containsKey(Keys.connections)) {
       var conns = SpUtil.getObjList(
           Keys.connections, (map) => Connection.fromJson(map));
@@ -188,5 +173,15 @@ class _AddPageState extends State<AddPage> {
     showToast(context, 'Save success');
     _saveEnabled = true;
     Navigator.of(context).pop();
+  }
+
+  Connection createConnection() {
+    String host = _hostController.text;
+    String port = _portController.text;
+    String user = _userController.text;
+    String password = _passwordController.text;
+    String database = _databaseController.text;
+    String alias = _aliasController.text;
+    return Connection(host, port, user, password, database, alias);
   }
 }

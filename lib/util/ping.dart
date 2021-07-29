@@ -1,23 +1,20 @@
-import 'package:flutter_icmp_ping/flutter_icmp_ping.dart';
+import 'dart:io';
 
-String ping(String host) {
+Future<String> testPing(String host, int port) async {
   var start = DateTime.now().millisecondsSinceEpoch;
   var end = 0;
-  try {
-    final ping = Ping(
-      host,
-      count: 1,
-      timeout: 1,
-      interval: 1,
-      ipv6: false,
-    );
-    ping.stream.listen((event) {});
-    ping.stop();
+  await RawSocket.connect(host, port, timeout: Duration(seconds: 1))
+      .then((socket) {
+    socket.close();
     end = DateTime.now().millisecondsSinceEpoch;
-  } catch (e) {
-    return 'fail';
-  }
+    print('ping: $host,$port success');
+  }).onError((error, stackTrace) {
+    print('ping: $host,$port $error'); 
+  });
   print('start = $start');
   print('end = $end');
+  if (end == 0) {
+    return 'fail';
+  }
   return '${end - start}ms';
 }

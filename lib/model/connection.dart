@@ -1,3 +1,5 @@
+import 'package:dart_mysql/dart_mysql.dart';
+
 class Connection {
   String host;
   String port;
@@ -13,6 +15,17 @@ class Connection {
     this.database,
     this.alias,
   );
+
+  Future<MySqlConnection> connect() async {
+    return await MySqlConnection.connect(ConnectionSettings(
+      host: host,
+      port: int.parse(port),
+      user: user,
+      db: database,
+      password: password,
+      timeout: Duration(seconds: 1),
+    ));
+  }
 
   Connection.fromJson(Map<String, dynamic> map)
       : host = map["host"],
