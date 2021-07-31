@@ -24,7 +24,6 @@ class _AddPageState extends State<AddPage> {
   late TextEditingController _passwordController;
   late TextEditingController _databaseController;
   late TextEditingController _aliasController;
-  late ScrollController _scrollController;
   bool _saveEnabled = true;
   bool _testEnabled = true;
   GlobalKey<FormState> _formKey = GlobalKey();
@@ -61,7 +60,7 @@ class _AddPageState extends State<AddPage> {
         ),
         backgroundColor: Colors.grey[200],
         child: SafeArea(
-            child: ListView(controller: _scrollController, children: [
+            child: ListView(children: [
           Form(
               key: _formKey,
               autovalidateMode: AutovalidateMode.always,
@@ -138,12 +137,12 @@ class _AddPageState extends State<AddPage> {
       return;
     }
     createConnection().connect().then((conn) async {
-      var results = await conn.query('select "PING OK" as t');
+      var results = await conn.query('select "success" as t');
       var nowTime = await results.first['t'];
-      showToast(context, 'Server: $nowTime');
+      showToast(context, 'Ping: $nowTime');
       _testEnabled = true;
     }).onError((error, stackTrace) {
-      showToast(context, 'Error: fail');
+      showToast(context, 'Ping: fail');
       _testEnabled = true;
     });
   }
