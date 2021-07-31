@@ -11,7 +11,7 @@ import 'package:sp_util/sp_util.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({
-    Key key,
+    Key? key,
   }) : super(key: key);
   @override
   _HomePageState createState() => _HomePageState();
@@ -139,8 +139,10 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       var conns = SpUtil.getObjList(
           Keys.connections, (map) => Connection.fromJson(map));
-      _connections.clear();
-      _connections.addAll(conns);
+      if (conns != null) {
+        _connections.clear();
+        _connections.addAll(conns);
+      }
     });
   }
 

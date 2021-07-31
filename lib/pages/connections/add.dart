@@ -8,36 +8,33 @@ import 'package:mysql_client_flutter/util/toast.dart';
 import 'package:sp_util/sp_util.dart';
 
 class AddPage extends StatefulWidget {
-  final Connection conn;
+  final Connection? conn;
   final int index;
   final bool edit;
-  AddPage({Key key, this.conn, this.index, this.edit = false})
+  AddPage({Key? key, this.conn, this.index = 0, this.edit = false})
       : super(key: key);
   @override
-  _AddPageState createState() =>
-      _AddPageState(this.conn, this.index, this.edit);
+  _AddPageState createState() => _AddPageState();
 }
 
 class _AddPageState extends State<AddPage> {
-  final Connection conn;
-  final int index;
-  final bool edit;
-  TextEditingController _portController;
-  TextEditingController _hostController;
-  TextEditingController _userController;
-  TextEditingController _passwordController;
-  TextEditingController _databaseController;
-  TextEditingController _aliasController;
-  ScrollController _scrollController;
+  late TextEditingController _portController;
+  late TextEditingController _hostController;
+  late TextEditingController _userController;
+  late TextEditingController _passwordController;
+  late TextEditingController _databaseController;
+  late TextEditingController _aliasController;
+  late ScrollController _scrollController;
   bool _saveEnabled = true;
   bool _testEnabled = true;
   GlobalKey<FormState> _formKey = GlobalKey();
 
-  _AddPageState(this.conn, this.index, this.edit);
+  _AddPageState();
 
   @override
   void initState() {
     super.initState();
+    var conn = widget.conn;
     _hostController = TextEditingController(text: conn?.host);
     _portController = TextEditingController(text: conn?.port);
     _userController = TextEditingController(text: conn?.user);
@@ -68,9 +65,7 @@ class _AddPageState extends State<AddPage> {
           Form(
               key: _formKey,
               autovalidateMode: AutovalidateMode.always,
-              onChanged: () {
-                Form.of(primaryFocus.context).save();
-              },
+              onChanged: () async => {},
               child: Column(children: [
                 buildCupertinoFormSection('CONNECTION', [
                   buildTextField('Host/IP', _hostController,
@@ -112,11 +107,11 @@ class _AddPageState extends State<AddPage> {
     );
   }
 
-  Widget buildTextField(String text, TextEditingController controller,
+  Widget buildTextField(String text, TextEditingController? controller,
       {bool password = false,
       TextInputType keyboardType = TextInputType.text,
       int maxLength = 50,
-      String placeholder}) {
+      required String placeholder}) {
     return CupertinoTextFormFieldRow(
       prefix: Text(text),
       obscureText: password,
@@ -127,15 +122,18 @@ class _AddPageState extends State<AddPage> {
       maxLines: 1,
       decoration: null,
       placeholder: placeholder,
-      validator: (String value) {
-        return value.isEmpty ? 'Please enter this field.' : null;
+      validator: (String? value) {
+        return value == null || value.isEmpty
+            ? 'Please enter this field.'
+            : null;
       },
     );
   }
 
   Future<void> test(BuildContext context) async {
     _testEnabled = false;
-    if (!_formKey.currentState.validate()) {
+    var validated = _formKey.currentState?.validate();
+    if (validated ?? false) {
       _testEnabled = true;
       return;
     }
@@ -152,17 +150,19 @@ class _AddPageState extends State<AddPage> {
 
   Future<void> save(BuildContext context) async {
     _saveEnabled = false;
-    if (!_formKey.currentState.validate()) {
+    var validated = _formKey.currentState?.validate();
+    if (validated ?? false) {
       _saveEnabled = true;
       return;
     }
     var conn = createConnection();
-    if (SpUtil.containsKey(Keys.connections)) {
+    if (SpUtil.containsKey(Keys.connections) ?? false) {
       var conns = SpUtil.getObjList(
-          Keys.connections, (map) => Connection.fromJson(map));
-      if (edit) {
+              Keys.connections, (map) => Connection.fromJson(map)) ??
+          [];
+      if (widget.edit) {
         // edit
-        conns[index] = conn;
+        conns[widget.index] = conn;
       } else {
         conns.add(conn);
       }

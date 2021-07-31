@@ -27,7 +27,7 @@ class Connection {
     ));
   }
 
-  Connection.fromJson(Map<String, dynamic> map)
+  Connection.fromJson(Map<dynamic, dynamic> map)
       : host = map["host"],
         port = map["port"],
         user = map["user"],

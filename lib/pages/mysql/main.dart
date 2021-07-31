@@ -10,13 +10,13 @@ import 'package:mysql_client_flutter/model/connection.dart';
 class MainPage extends StatefulWidget {
   final String title;
   final Connection conn;
-  MainPage(this.conn, {this.title});
+  MainPage(this.conn, {this.title = ''});
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  MySqlConnection conn;
+  late MySqlConnection conn;
   final _tabBars = ["Tables", "Routines", "Query", "Files", "Snippets"];
   final _tabBarIcons = <IconData>[
     CupertinoIcons.table,
@@ -25,6 +25,7 @@ class _MainPageState extends State<MainPage> {
     Icons.file_present,
     Icons.extension,
   ];
+  int queryMaxLines = 28;
 
   @override
   void initState() {
@@ -66,17 +67,21 @@ class _MainPageState extends State<MainPage> {
       // create table tab view
       case 0:
         return buildTableTabView(context);
-        break;
       case 1:
         // create routine tab view
         return buildRoutineTabView(context);
-        break;
       case 2:
         // create query tab view
         return buildQueryTabView(context);
-        break;
+      case 3:
+        // create file tab view
+        return buildFileTabView(context);
+      case 4:
+        // create snippet tab view
+        return buildSnippetTabView(context);
+      default:
+        return buildTableTabView(context);
     }
-    return null;
   }
 
   Widget buildTableTabView(BuildContext context) {
@@ -90,13 +95,7 @@ class _MainPageState extends State<MainPage> {
                   child: Text(
                     'New query',
                     style: TextStyle(fontSize: 18),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Icon(
-                    CupertinoIcons.greaterthan,
-                    color: Colors.grey,
-                  )),
+                  ))
             ])),
         CupertinoFormRow(
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -106,88 +105,23 @@ class _MainPageState extends State<MainPage> {
                   child: Text(
                     'New table',
                     style: TextStyle(fontSize: 18),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Icon(
-                    CupertinoIcons.greaterthan,
-                    color: Colors.grey,
-                  )),
+                  ))
             ])),
       ]),
-      CupertinoFormSection(header: Text('TABLES'), children: [
-        CupertinoFormRow(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Row(children: [
-              Expanded(
-                  flex: 19,
-                  child: Text(
-                    'New query',
-                    style: TextStyle(fontSize: 18),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Icon(
-                    CupertinoIcons.greaterthan,
-                    color: Colors.grey,
-                  )),
-            ])),
-        CupertinoFormRow(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Row(children: [
-              Expanded(
-                  flex: 19,
-                  child: Text(
-                    'New table',
-                    style: TextStyle(fontSize: 18),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Icon(
-                    CupertinoIcons.greaterthan,
-                    color: Colors.grey,
-                  )),
-            ])),
-      ]),
+      CupertinoFormSection(header: Text('TABLES'), children: buildTableItems()),
     ]);
   }
 
   Widget buildRoutineTabView(BuildContext context) {
-    return Column(children: [
-      CupertinoFormSection(header: Text('ROUTINES'), children: [
-        CupertinoFormRow(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Row(children: [
-              Expanded(
-                  flex: 19,
-                  child: Text(
-                    'New query',
-                    style: TextStyle(fontSize: 18),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Icon(
-                    CupertinoIcons.greaterthan,
-                    color: Colors.grey,
-                  )),
-            ])),
-        CupertinoFormRow(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Row(children: [
-              Expanded(
-                  flex: 19,
-                  child: Text(
-                    'New table',
-                    style: TextStyle(fontSize: 18),
-                  )),
-              Expanded(
-                  flex: 1,
-                  child: Icon(
-                    CupertinoIcons.greaterthan,
-                    color: Colors.grey,
-                  )),
-            ])),
-      ]),
+    return CupertinoFormSection(header: Text('ROUTINES'), children: [
+      CupertinoFormRow(
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        prefix: Text(
+          'proc_helloworld',
+          style: TextStyle(fontSize: 18),
+        ),
+        child: Text(''),
+      ),
     ]);
   }
 
@@ -198,8 +132,10 @@ class _MainPageState extends State<MainPage> {
           children: [
             CupertinoButton(
                 child: Text('OK'),
-                onPressed: () async =>
-                    {FocusScope.of(context).requestFocus(FocusNode())}),
+                onPressed: () async {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  setQueryMaxline(28);
+                }),
             CupertinoButton(child: Text('Execute'), onPressed: () async => {}),
             CupertinoButton(child: Text('Save'), onPressed: () async => {}),
           ],
@@ -207,23 +143,67 @@ class _MainPageState extends State<MainPage> {
         Container(
             padding: EdgeInsets.only(left: 5, right: 5, top: 0, bottom: 60),
             child: CupertinoTextField(
-              onTap: () async => {},
-              maxLines: 28,
+              onTap: () async => setQueryMaxline(14),
+              maxLines: queryMaxLines,
             ))
       ],
     );
   }
 
+  Widget buildFileTabView(BuildContext context) {
+    return Column(children: [
+      CupertinoFormSection(header: Text('FILES'), children: [
+        CupertinoFormRow(
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          prefix: Text(
+            'file.sql',
+            style: TextStyle(fontSize: 18),
+          ),
+          child: Text(''),
+        ),
+      ]),
+    ]);
+  }
+
+  Widget buildSnippetTabView(BuildContext context) {
+    return Column(children: [
+      CupertinoFormSection(header: Text('SNIPPETS'), children: [
+        CupertinoFormRow(
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          prefix: Text(
+            'select_table_person',
+            style: TextStyle(fontSize: 18),
+          ),
+          child: Text(''),
+        ),
+      ]),
+    ]);
+  }
+
+  void setQueryMaxline(int maxLines) => setState(() {
+        queryMaxLines = maxLines;
+      });
+
   Future<void> open() async {
     var conn = await widget.conn.connect();
-    if (conn != null) {
-      var results = await conn.query('select 1');
-      if (results.length > 0) {
-        this.conn = conn;
-        return;
-      }
+    var results = await conn.query('select 1');
+    if (results.length > 0) {
+      this.conn = conn;
+      return;
     }
     EasyLoading.showError('connect: fail');
     Navigator.of(context).pop();
+  }
+
+  List<Widget> buildTableItems() {
+    return [
+      CupertinoFormRow(
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          prefix: Text(
+            'table_person',
+            style: TextStyle(fontSize: 18),
+          ),
+          child: Text(''))
+    ];
   }
 }
