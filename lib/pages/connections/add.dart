@@ -132,7 +132,7 @@ class _AddPageState extends State<AddPage> {
   Future<void> test(BuildContext context) async {
     _testEnabled = false;
     var validated = _formKey.currentState?.validate();
-    if (validated ?? false) {
+    if (validated == false) {
       _testEnabled = true;
       return;
     }
@@ -150,7 +150,7 @@ class _AddPageState extends State<AddPage> {
   Future<void> save(BuildContext context) async {
     _saveEnabled = false;
     var validated = _formKey.currentState?.validate();
-    if (validated ?? false) {
+    if (validated == false) {
       _saveEnabled = true;
       return;
     }

@@ -1,4 +1,4 @@
-class Table {
+class DBTable {
   final String schema;
   final String engine;
   final String name;
@@ -7,7 +7,7 @@ class Table {
   final String createTime;
   final String collation;
   final String createOptions;
-  Table({
+  DBTable({
     required this.schema,
     required this.engine,
     required this.name,

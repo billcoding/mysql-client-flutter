@@ -1,11 +1,12 @@
 library mysql_main;
 
-import 'package:flutter/cupertino.dart';
 import 'package:dart_mysql/dart_mysql.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
+import 'package:mysql_client_flutter/model/table.dart';
+import 'package:mysql_client_flutter/util/mysql.dart';
 
 class MainPage extends StatefulWidget {
   final String title;
@@ -25,12 +26,15 @@ class _MainPageState extends State<MainPage> {
     Icons.file_present,
     Icons.extension,
   ];
+
   int queryMaxLines = 28;
+  List<DBTable> _tables = [];
 
   @override
   void initState() {
     super.initState();
     open();
+    refreshTables();
   }
 
   @override
@@ -184,6 +188,18 @@ class _MainPageState extends State<MainPage> {
         queryMaxLines = maxLines;
       });
 
+  List<Widget> buildTableItems() {
+    return _tables
+        .map((t) => CupertinoFormRow(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            prefix: Text(
+              t.name,
+              style: TextStyle(fontSize: 18),
+            ),
+            child: Text('')))
+        .toList();
+  }
+
   Future<void> open() async {
     var conn = await widget.conn.connect();
     var results = await conn.query('select 1');
@@ -195,15 +211,9 @@ class _MainPageState extends State<MainPage> {
     Navigator.of(context).pop();
   }
 
-  List<Widget> buildTableItems() {
-    return [
-      CupertinoFormRow(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          prefix: Text(
-            'table_person',
-            style: TextStyle(fontSize: 18),
-          ),
-          child: Text(''))
-    ];
+  Future<void> refreshTables() async {
+    setState(() async {
+      _tables = (await queryTable(conn, widget.conn));
+    });
   }
 }
