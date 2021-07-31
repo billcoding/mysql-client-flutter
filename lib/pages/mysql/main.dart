@@ -67,6 +67,14 @@ class _MainPageState extends State<MainPage> {
       case 0:
         return buildTableTabView(context);
         break;
+      case 1:
+        // create routine tab view
+        return buildRoutineTabView(context);
+        break;
+      case 2:
+        // create query tab view
+        return buildQueryTabView(context);
+        break;
     }
     return null;
   }
@@ -142,6 +150,68 @@ class _MainPageState extends State<MainPage> {
             ])),
       ]),
     ]);
+  }
+
+  Widget buildRoutineTabView(BuildContext context) {
+    return Column(children: [
+      CupertinoFormSection(header: Text('ROUTINES'), children: [
+        CupertinoFormRow(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: Row(children: [
+              Expanded(
+                  flex: 19,
+                  child: Text(
+                    'New query',
+                    style: TextStyle(fontSize: 18),
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Icon(
+                    CupertinoIcons.greaterthan,
+                    color: Colors.grey,
+                  )),
+            ])),
+        CupertinoFormRow(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: Row(children: [
+              Expanded(
+                  flex: 19,
+                  child: Text(
+                    'New table',
+                    style: TextStyle(fontSize: 18),
+                  )),
+              Expanded(
+                  flex: 1,
+                  child: Icon(
+                    CupertinoIcons.greaterthan,
+                    color: Colors.grey,
+                  )),
+            ])),
+      ]),
+    ]);
+  }
+
+  Widget buildQueryTabView(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            CupertinoButton(
+                child: Text('OK'),
+                onPressed: () async =>
+                    {FocusScope.of(context).requestFocus(FocusNode())}),
+            CupertinoButton(child: Text('Execute'), onPressed: () async => {}),
+            CupertinoButton(child: Text('Save'), onPressed: () async => {}),
+          ],
+        ),
+        Container(
+            padding: EdgeInsets.only(left: 5, right: 5, top: 0, bottom: 60),
+            child: CupertinoTextField(
+              onTap: () async => {},
+              maxLines: 28,
+            ))
+      ],
+    );
   }
 
   Future<void> open() async {

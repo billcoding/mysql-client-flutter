@@ -19,19 +19,9 @@ class App extends StatelessWidget {
       builder: () {
         var widget = EasyLoading.init();
         EasyLoading.instance
-              ..displayDuration = const Duration(seconds: 2)
-              ..indicatorType = EasyLoadingIndicatorType.ring
-              ..loadingStyle = EasyLoadingStyle.light
-            // ..indicatorSize = 45.0
-            // ..radius = 10.0
-            // ..progressColor = Colors.red
-            // ..backgroundColor = Colors.white
-            // ..indicatorColor = Colors.black
-            // ..textColor = Colors.black
-            // ..maskColor = Colors.blue
-            // ..userInteractions = false
-            // ..dismissOnTap = false;
-            ;
+          ..displayDuration = const Duration(seconds: 2)
+          ..indicatorType = EasyLoadingIndicatorType.ring
+          ..loadingStyle = EasyLoadingStyle.light;
         return widget;
       }(),
     );
