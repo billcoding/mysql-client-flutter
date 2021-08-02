@@ -11,7 +11,7 @@ Future<List<DBTable>> queryTable(
             t.TABLE_NAME,
             t.TABLE_COMMENT,
             t.ROW_FORMAT,
-            t.CREATE_TIME,
+            DATE_FORMAT(t.CREATE_TIME, '%Y-%m-%d'),
             t.TABLE_COLLATION,
             t.CREATE_OPTIONS
       from information_schema.TABLES as t
@@ -20,7 +20,7 @@ Future<List<DBTable>> queryTable(
   ''', [conn.database]);
   var tables = <DBTable>[];
   results.forEach((r) {
-    tables.add(DBTable(
+    var dbt = DBTable(
         schema: r[0],
         engine: r[1],
         name: r[2],
@@ -28,7 +28,9 @@ Future<List<DBTable>> queryTable(
         rowFormat: r[4],
         createTime: r[5],
         collation: r[6],
-        createOptions: r[7]));
+        createOptions: r[7]);
+    tables.add(dbt);
+    print('queryTable table: $dbt');
   });
   return tables;
 }

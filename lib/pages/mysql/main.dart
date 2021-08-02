@@ -17,7 +17,6 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  late MySqlConnection conn;
   final _tabBars = ["Tables", "Routines", "Query", "Files", "Snippets"];
   final _tabBarIcons = <IconData>[
     CupertinoIcons.table,
@@ -89,31 +88,40 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget buildTableTabView(BuildContext context) {
-    return Column(children: [
-      CupertinoFormSection(header: Text('ACTIONS'), children: [
-        CupertinoFormRow(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Row(children: [
-              Expanded(
-                  flex: 19,
-                  child: Text(
-                    'New query',
-                    style: TextStyle(fontSize: 18),
-                  ))
-            ])),
-        CupertinoFormRow(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Row(children: [
-              Expanded(
-                  flex: 19,
-                  child: Text(
-                    'New table',
-                    style: TextStyle(fontSize: 18),
-                  ))
-            ])),
-      ]),
-      CupertinoFormSection(header: Text('TABLES'), children: buildTableItems()),
-    ]);
+    return
+
+        // Column(children: [
+        //   CupertinoFormSection(header: Text('ACTIONS'), children: [
+        //     CupertinoFormRow(
+        //         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        //         child: Row(children: [
+        //           Expanded(
+        //               flex: 19,
+        //               child: Text(
+        //                 'New query',
+        //                 style: TextStyle(fontSize: 18),
+        //               ))
+        //         ])),
+        //     CupertinoFormRow(
+        //         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        //         child: Row(children: [
+        //           Expanded(
+        //               flex: 19,
+        //               child: Text(
+        //                 'New table',
+        //                 style: TextStyle(fontSize: 18),
+        //               ))
+        //         ])),
+        //   ]),
+        // CupertinoFormSection(header: Text('TABLES'), children: [
+        ListView.builder(
+            itemCount: _tables.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Text(_tables[index].name, style: TextStyle(fontSize: 18));
+            });
+    // ]),
+    // ]
+    // );
   }
 
   Widget buildRoutineTabView(BuildContext context) {
@@ -188,23 +196,11 @@ class _MainPageState extends State<MainPage> {
         queryMaxLines = maxLines;
       });
 
-  List<Widget> buildTableItems() {
-    return _tables
-        .map((t) => CupertinoFormRow(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            prefix: Text(
-              t.name,
-              style: TextStyle(fontSize: 18),
-            ),
-            child: Text('')))
-        .toList();
-  }
-
   Future<void> open() async {
     var conn = await widget.conn.connect();
     var results = await conn.query('select 1');
     if (results.length > 0) {
-      this.conn = conn;
+      conn.close();
       return;
     }
     EasyLoading.showError('connect: fail');
@@ -212,8 +208,10 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> refreshTables() async {
-    setState(() async {
-      _tables = (await queryTable(conn, widget.conn));
+    var conn = await widget.conn.connect();
+    var ls = await queryTable(conn, widget.conn);
+    setState(() {
+      _tables = ls;
     });
   }
 }
