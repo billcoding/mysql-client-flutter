@@ -76,7 +76,7 @@ class _AddPageState extends State<AddPage> {
                   buildTextField('User', _userController, placeholder: "root"),
                   buildTextField('Password', _passwordController,
                       password: true, placeholder: "password"),
-                  buildTextField('Datebase', _databaseController,
+                  buildTextField('Database', _databaseController, 
                       placeholder: "test"),
                 ]),
                 buildCupertinoFormSection('OTHER', [
