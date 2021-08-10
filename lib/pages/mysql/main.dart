@@ -1,6 +1,5 @@
 library mysql_main;
 
-import 'package:dart_mysql/dart_mysql.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -33,7 +32,9 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     open();
-    refreshTables();
+    Future.delayed(Duration(milliseconds: 100), () {
+      refreshTables();
+    });
   }
 
   @override
@@ -88,40 +89,31 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget buildTableTabView(BuildContext context) {
-    return
-
-        // Column(children: [
-        //   CupertinoFormSection(header: Text('ACTIONS'), children: [
-        //     CupertinoFormRow(
-        //         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        //         child: Row(children: [
-        //           Expanded(
-        //               flex: 19,
-        //               child: Text(
-        //                 'New query',
-        //                 style: TextStyle(fontSize: 18),
-        //               ))
-        //         ])),
-        //     CupertinoFormRow(
-        //         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        //         child: Row(children: [
-        //           Expanded(
-        //               flex: 19,
-        //               child: Text(
-        //                 'New table',
-        //                 style: TextStyle(fontSize: 18),
-        //               ))
-        //         ])),
-        //   ]),
-        // CupertinoFormSection(header: Text('TABLES'), children: [
-        ListView.builder(
-            itemCount: _tables.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Text(_tables[index].name, style: TextStyle(fontSize: 18));
-            });
-    // ]),
-    // ]
-    // );
+    return ListView(children: [
+      CupertinoFormSection(header: Text('ACTIONS'), children: [
+        CupertinoFormRow(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: Row(children: [
+              Expanded(
+                  flex: 19,
+                  child: Text(
+                    'New query',
+                    style: TextStyle(fontSize: 18),
+                  ))
+            ])),
+        CupertinoFormRow(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: Row(children: [
+              Expanded(
+                  flex: 19,
+                  child: Text(
+                    'New table',
+                    style: TextStyle(fontSize: 18),
+                  ))
+            ])),
+      ]),
+      CupertinoFormSection(header: Text('TABLES'), children: buildTableItems()),
+    ]);
   }
 
   Widget buildRoutineTabView(BuildContext context) {
@@ -203,15 +195,45 @@ class _MainPageState extends State<MainPage> {
       conn.close();
       return;
     }
-    EasyLoading.showError('connect: fail');
+    EasyLoading.showError('Connect: fail');
     Navigator.of(context).pop();
+  }
+
+  List<Widget> buildTableItems() {
+    if (_tables.isEmpty) {
+      return [
+        CupertinoFormRow(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: Row(children: [
+              Expanded(
+                  flex: 19,
+                  child: Text(
+                    'No table found',
+                    style: TextStyle(fontSize: 18),
+                  ))
+            ]))
+      ];
+    }
+    return _tables.map((t) {
+      return CupertinoFormRow(
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          child: Row(children: [
+            Expanded(
+                flex: 19,
+                child: Text(
+                  t.name,
+                  style: TextStyle(fontSize: 18),
+                ))
+          ]));
+    }).toList();
   }
 
   Future<void> refreshTables() async {
     var conn = await widget.conn.connect();
-    var ls = await queryTable(conn, widget.conn);
+    var tables = await queryTable(conn, widget.conn);
+    _tables.clear();
     setState(() {
-      _tables = ls;
+      _tables.addAll(tables);
     });
   }
 }

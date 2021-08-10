@@ -211,7 +211,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> start(BuildContext context, int index) async {
-    EasyLoading.show(status: 'connecting...');
+    EasyLoading.show(status: 'Connecting...');
     var _conn = _connections[index];
     _conn.connect().then((conn) async {
       conn.close();
@@ -219,7 +219,7 @@ class _HomePageState extends State<HomePage> {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => MainPage(_conn, title: _conn.alias)));
     }).onError((error, stackTrace) {
-      EasyLoading.showError('connect: fail');
+      EasyLoading.showError('Connect: fail');
     });
   }
 }
