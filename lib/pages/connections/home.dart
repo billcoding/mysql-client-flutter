@@ -183,12 +183,12 @@ class _HomePageState extends State<HomePage> {
                       _connections.removeAt(index);
                       SpUtil.putObjectList(Keys.connections, _connections);
                       refresh();
-                      Navigator.of(context).pop();
+                      Navigator.pop(context);
                     }),
                 CupertinoButton(
                     child: Text('No',
                         style: TextStyle(fontWeight: FontWeight.bold)),
-                    onPressed: () async => Navigator.of(context).pop())
+                    onPressed: () async => Navigator.pop(context))
               ],
             ));
   }

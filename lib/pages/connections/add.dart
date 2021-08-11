@@ -51,12 +51,18 @@ class _AddPageState extends State<AddPage> {
             style: TextStyle(color: Colors.black),
           ),
           trailing: GestureDetector(
-            child: Text(
-              'Save',
-              style: TextStyle(color: Colors.blue),
-            ),
-            onTap: () async => _saveEnabled ? save(context) : null,
-          ),
+              child: Icon(Icons.list),
+              onTap: () async {
+                showCupertinoModalPopup(
+                    context: context,
+                    barrierColor: CupertinoDynamicColor.withBrightness(
+                      color: Color(0x00000000),
+                      darkColor: Color(0x7A000000),
+                    ),
+                    builder: (context) {
+                      return Column(children: [Text('data')]);
+                    });
+              }),
         ),
         backgroundColor: Colors.grey[200],
         child: SafeArea(
@@ -76,7 +82,7 @@ class _AddPageState extends State<AddPage> {
                   buildTextField('User', _userController, placeholder: "root"),
                   buildTextField('Password', _passwordController,
                       password: true, placeholder: "password"),
-                  buildTextField('Database', _databaseController, 
+                  buildTextField('Database', _databaseController,
                       placeholder: "test"),
                 ]),
                 buildCupertinoFormSection('OTHER', [
@@ -171,7 +177,7 @@ class _AddPageState extends State<AddPage> {
     }
     showToast(context, 'Save success');
     _saveEnabled = true;
-    Navigator.of(context).pop();
+    Navigator.pop(context);
   }
 
   Connection createConnection() {

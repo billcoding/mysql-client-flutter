@@ -196,7 +196,7 @@ class _MainPageState extends State<MainPage> {
       return;
     }
     EasyLoading.showError('Connect: fail');
-    Navigator.of(context).pop();
+    Navigator.pop(context);
   }
 
   List<Widget> buildTableItems() {
