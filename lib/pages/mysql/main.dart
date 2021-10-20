@@ -4,7 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
+import 'package:mysql_client_flutter/model/schema.dart';
 import 'package:mysql_client_flutter/model/table.dart';
+import 'package:mysql_client_flutter/pages/mysql/pages/query.dart';
+import 'package:mysql_client_flutter/pages/mysql/pages/table.dart';
 import 'package:mysql_client_flutter/util/mysql.dart';
 
 class MainPage extends StatefulWidget {
@@ -16,16 +19,22 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final _tabBars = ["Tables", "Routines", "Query", "Files", "Snippets"];
+  final _tabBars = [
+    "Schemas",
+    "Tables",
+    "Routines",
+    "Snippets",
+    "Files",
+  ];
   final _tabBarIcons = <IconData>[
     CupertinoIcons.table,
+    CupertinoIcons.table,
     Icons.storage,
-    Icons.create,
-    Icons.file_present,
     Icons.extension,
+    Icons.file_present,
   ];
 
-  int queryMaxLines = 28;
+  List<Schema> _schemas = [];
   List<DBTable> _tables = [];
 
   @override
@@ -33,6 +42,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     open();
     Future.delayed(Duration(milliseconds: 100), () {
+      refreshSchemas();
       refreshTables();
     });
   }
@@ -68,24 +78,31 @@ class _MainPageState extends State<MainPage> {
 
   Widget buildTab(BuildContext context, int index) {
     switch (index) {
-      // create table tab view
+      // create Schema tab view
       case 0:
-        return buildTableTabView(context);
+        return buildSchemaTabView(context);
+      // create table tab view
       case 1:
+        return buildTableTabView(context);
+      case 2:
         // create routine tab view
         return buildRoutineTabView(context);
-      case 2:
-        // create query tab view
-        return buildQueryTabView(context);
       case 3:
-        // create file tab view
-        return buildFileTabView(context);
-      case 4:
         // create snippet tab view
         return buildSnippetTabView(context);
+      case 4:
+        // create file tab view
+        return buildFileTabView(context);
       default:
         return buildTableTabView(context);
     }
+  }
+
+  Widget buildSchemaTabView(BuildContext context) {
+    return ListView(children: [
+      CupertinoFormSection(
+          header: Text('SCHEMAS'), children: buildSchemaItems()),
+    ]);
   }
 
   Widget buildTableTabView(BuildContext context) {
@@ -95,21 +112,33 @@ class _MainPageState extends State<MainPage> {
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Row(children: [
               Expanded(
-                  flex: 19,
-                  child: Text(
-                    'New query',
-                    style: TextStyle(fontSize: 18),
-                  ))
+                flex: 1,
+                child: GestureDetector(
+                    child: Text(
+                      'New query',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    onTap: () => Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (context) {
+                          return QueryPage(widget.conn);
+                        }))),
+              )
             ])),
         CupertinoFormRow(
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Row(children: [
               Expanded(
-                  flex: 19,
-                  child: Text(
-                    'New table',
-                    style: TextStyle(fontSize: 18),
-                  ))
+                flex: 1,
+                child: GestureDetector(
+                    child: Text(
+                      'New table',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    onTap: () => Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (context) {
+                          return TablePage(widget.conn);
+                        }))),
+              )
             ])),
       ]),
       CupertinoFormSection(header: Text('TABLES'), children: buildTableItems()),
@@ -127,31 +156,6 @@ class _MainPageState extends State<MainPage> {
         child: Text(''),
       ),
     ]);
-  }
-
-  Widget buildQueryTabView(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            CupertinoButton(
-                child: Text('OK'),
-                onPressed: () async {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  setQueryMaxline(28);
-                }),
-            CupertinoButton(child: Text('Execute'), onPressed: () async => {}),
-            CupertinoButton(child: Text('Save'), onPressed: () async => {}),
-          ],
-        ),
-        Container(
-            padding: EdgeInsets.only(left: 5, right: 5, top: 0, bottom: 60),
-            child: CupertinoTextField(
-              onTap: () async => setQueryMaxline(14),
-              maxLines: queryMaxLines,
-            ))
-      ],
-    );
   }
 
   Widget buildFileTabView(BuildContext context) {
@@ -184,10 +188,6 @@ class _MainPageState extends State<MainPage> {
     ]);
   }
 
-  void setQueryMaxline(int maxLines) => setState(() {
-        queryMaxLines = maxLines;
-      });
-
   Future<void> open() async {
     var conn = await widget.conn.connect();
     var results = await conn.query('select 1');
@@ -197,6 +197,35 @@ class _MainPageState extends State<MainPage> {
     }
     EasyLoading.showError('Connect: fail');
     Navigator.pop(context);
+  }
+
+  List<Widget> buildSchemaItems() {
+    if (_schemas.isEmpty) {
+      return [
+        CupertinoFormRow(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: Row(children: [
+              Expanded(
+                  flex: 19,
+                  child: Text(
+                    'No schema found',
+                    style: TextStyle(fontSize: 18),
+                  ))
+            ]))
+      ];
+    }
+    return _schemas.map((t) {
+      return CupertinoFormRow(
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          child: Row(children: [
+            Expanded(
+                flex: 19,
+                child: Text(
+                  t.name,
+                  style: TextStyle(fontSize: 18),
+                ))
+          ]));
+    }).toList();
   }
 
   List<Widget> buildTableItems() {
@@ -226,6 +255,15 @@ class _MainPageState extends State<MainPage> {
                 ))
           ]));
     }).toList();
+  }
+
+  Future<void> refreshSchemas() async {
+    var conn = await widget.conn.connect();
+    var schemas = await querySchema(conn, widget.conn);
+    _schemas.clear();
+    setState(() {
+      _schemas.addAll(schemas);
+    });
   }
 
   Future<void> refreshTables() async {

@@ -1,7 +1,26 @@
 import 'package:dart_mysql/dart_mysql.dart';
 import 'package:mysql_client_flutter/model/column.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
+import 'package:mysql_client_flutter/model/schema.dart';
 import 'package:mysql_client_flutter/model/table.dart';
+
+Future<List<Schema>> querySchema(
+    MySqlConnection mysqlConn, Connection conn) async {
+  var results = await mysqlConn.query('''
+select t.SCHEMA_NAME,
+       t.DEFAULT_CHARACTER_SET_NAME,
+       t.DEFAULT_COLLATION_NAME
+from information_schema.SCHEMATA as t
+where t.SCHEMA_NAME not in ('information_schema', 'sys', 'mysql', 'performance_schema')
+  ''');
+  var schemas = <Schema>[];
+  results.forEach((r) {
+    var sch = Schema(r[0], r[1], r[2]);
+    schemas.add(sch);
+    print('querySchema schema: $sch');
+  });
+  return schemas;
+}
 
 Future<List<DBTable>> queryTable(
     MySqlConnection mysqlConn, Connection conn) async {
