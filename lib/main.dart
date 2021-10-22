@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:sp_util/sp_util.dart';
-import 'pages/connections/home.dart';
+import 'pages/connection.dart';
 
 void main() {
   runApp(App());
@@ -15,10 +15,11 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoApp(
       theme: const CupertinoThemeData(brightness: Brightness.light),
-      home: HomePage(),
+      home: ConnectionPage(),
       builder: () {
         var widget = EasyLoading.init();
         EasyLoading.instance
+          ..userInteractions = false
           ..displayDuration = const Duration(seconds: 2)
           ..indicatorType = EasyLoadingIndicatorType.ring
           ..loadingStyle = EasyLoadingStyle.light;

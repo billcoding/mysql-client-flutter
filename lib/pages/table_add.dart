@@ -1,17 +1,15 @@
-library mysql_query;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
 
-class QueryPage extends StatefulWidget {
+class TableAddPage extends StatefulWidget {
   final Connection conn;
-  QueryPage(this.conn);
+  TableAddPage(this.conn);
   @override
-  _QueryPageState createState() => _QueryPageState();
+  _TableAddPageState createState() => _TableAddPageState();
 }
 
-class _QueryPageState extends State<QueryPage> {
+class _TableAddPageState extends State<TableAddPage> {
   @override
   void initState() {
     super.initState();
@@ -23,12 +21,12 @@ class _QueryPageState extends State<QueryPage> {
         backgroundColor: Colors.grey[200],
         navigationBar: CupertinoNavigationBar(
           middle: Text(
-            'query',
+            'table',
             style: TextStyle(color: Colors.black),
           ),
           trailing: GestureDetector(
               child: Icon(Icons.run_circle), onTap: () async {}),
         ),
-        child: SafeArea(child: Text('query')));
+        child: SafeArea(child: Text('table')));
   }
 }

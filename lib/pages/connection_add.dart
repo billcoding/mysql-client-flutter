@@ -7,17 +7,17 @@ import 'package:mysql_client_flutter/strings/keys.dart';
 import 'package:mysql_client_flutter/util/toast.dart';
 import 'package:sp_util/sp_util.dart';
 
-class AddPage extends StatefulWidget {
+class ConnectionAddPage extends StatefulWidget {
   final Connection? conn;
   final int index;
   final bool edit;
-  AddPage({Key? key, this.conn, this.index = 0, this.edit = false})
+  ConnectionAddPage({Key? key, this.conn, this.index = 0, this.edit = false})
       : super(key: key);
   @override
-  _AddPageState createState() => _AddPageState();
+  _ConnectionAddPageState createState() => _ConnectionAddPageState();
 }
 
-class _AddPageState extends State<AddPage> {
+class _ConnectionAddPageState extends State<ConnectionAddPage> {
   late TextEditingController _portController;
   late TextEditingController _hostController;
   late TextEditingController _userController;
@@ -28,7 +28,7 @@ class _AddPageState extends State<AddPage> {
   bool _testEnabled = true;
   GlobalKey<FormState> _formKey = GlobalKey();
 
-  _AddPageState();
+  _ConnectionAddPageState();
 
   @override
   void initState() {
@@ -47,22 +47,15 @@ class _AddPageState extends State<AddPage> {
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
           middle: Text(
-            'Connection',
+            widget.edit
+                ? 'edit: ${widget.conn!.alias}'
+                : 'add' +
+                    (widget.conn != null
+                        ? (': copy from ' + widget.conn!.alias)
+                        : ''),
             style: TextStyle(color: Colors.black),
           ),
-          trailing: GestureDetector(
-              child: Icon(Icons.list),
-              onTap: () async {
-                showCupertinoModalPopup(
-                    context: context,
-                    barrierColor: CupertinoDynamicColor.withBrightness(
-                      color: Color(0x00000000),
-                      darkColor: Color(0x7A000000),
-                    ),
-                    builder: (context) {
-                      return Column(children: [Text('data')]);
-                    });
-              }),
+          trailing: null,
         ),
         backgroundColor: Colors.grey[200],
         child: SafeArea(
@@ -148,7 +141,7 @@ class _AddPageState extends State<AddPage> {
       showToast(context, 'Ping: $nowTime');
       _testEnabled = true;
     }).onError((error, stackTrace) {
-      showToast(context, 'Ping: fail');
+      showToast(context, 'Ping: $error');
       _testEnabled = true;
     });
   }

@@ -1,4 +1,4 @@
-class Column {
+class DBColumn {
   final String schema;
   final String collation;
   final String charset;
@@ -16,8 +16,7 @@ class Column {
   final String? charactorMaxLength;
   final int? numericPrecision;
   final int? numericScale;
-
-  Column({
+  DBColumn({
     required this.schema,
     required this.collation,
     required this.charset,

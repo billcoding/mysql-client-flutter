@@ -18,7 +18,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.14.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -31,6 +31,9 @@ dependencies:
   fluttertoast: ^8.0.7
   sp_util: ^2.0.3
   flutter_easyloading: ^3.0.0
+  share: ^2.0.4
+  excel: ^2.0.0-null-safety-3
+  path_provider: ^2.0.5
 
 dev_dependencies:
   flutter_test:
@@ -45,8 +48,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-  assets:
-    - assets/images/mysql.png
+  # assets:
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

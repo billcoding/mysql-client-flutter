@@ -1,30 +1,33 @@
+import 'dart:io';
+
+import 'package:excel/excel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
-import 'package:mysql_client_flutter/pages/connections/add.dart';
-import 'package:mysql_client_flutter/pages/mysql/main.dart';
+import 'package:mysql_client_flutter/pages/connection_add.dart';
+import 'package:mysql_client_flutter/pages/mysql.dart';
 import 'package:mysql_client_flutter/strings/keys.dart';
-import 'package:mysql_client_flutter/util/ping.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share/share.dart';
 import 'package:sp_util/sp_util.dart';
 
-class HomePage extends StatefulWidget {
-  HomePage({
+class ConnectionPage extends StatefulWidget {
+  ConnectionPage({
     Key? key,
   }) : super(key: key);
   @override
-  _HomePageState createState() => _HomePageState();
+  _ConnectionPageState createState() => _ConnectionPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  bool _pingEnabled = true;
+class _ConnectionPageState extends State<ConnectionPage> {
   List<Connection> _connections = <Connection>[];
   List<String> _connectionPings = <String>[];
   @override
   void initState() {
-    Future.delayed(Duration(seconds: 1), () async => refresh());
     super.initState();
+    Future.delayed(Duration(milliseconds: 1), () async => refresh());
   }
 
   @override
@@ -34,13 +37,12 @@ class _HomePageState extends State<HomePage> {
         navigationBar: CupertinoNavigationBar(
           middle: Text('Connections', style: TextStyle(color: Colors.black)),
           leading: GestureDetector(
-              child: Icon(Icons.refresh_sharp),
-              onTap: () async => _pingEnabled ? ping(context) : null),
+              child: Icon(Icons.settings_outlined), onTap: () async {}),
           trailing: GestureDetector(
             child: Icon(CupertinoIcons.add),
             onTap: () async => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (context) {
-              return AddPage();
+              return ConnectionAddPage();
             })).then((value) async => refresh()),
           ),
         ),
@@ -60,21 +62,17 @@ class _HomePageState extends State<HomePage> {
         padding: EdgeInsets.only(left: 20, top: 20),
         child: Row(children: [
           Expanded(
-              flex: 1,
-              child: Container(
-                  child: Image(
-                image: AssetImage('assets/images/mysql.png'),
-                fit: BoxFit.fill,
-              ))),
-          Expanded(
-              flex: 3,
+              flex: 5,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     '${conn.alias}',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(
                     '${conn.host}',
@@ -82,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               )),
           Expanded(
-              flex: 5,
+              flex: 2,
               child: Container(
                   padding: EdgeInsets.only(right: 10),
                   child: Text(
@@ -94,7 +92,6 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.green),
                   ))),
           Expanded(
-            flex: 1,
             child: CupertinoButton(
               padding: EdgeInsets.only(right: 10),
               child: Icon(
@@ -104,7 +101,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            flex: 1,
             child: CupertinoButton(
               padding: EdgeInsets.only(right: 10),
               child: Icon(
@@ -114,7 +110,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            flex: 1,
             child: CupertinoButton(
               padding: EdgeInsets.only(right: 10),
               child: Icon(Icons.copy),
@@ -122,7 +117,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            flex: 1,
             child: CupertinoButton(
               padding: EdgeInsets.only(right: 10),
               child: Icon(
@@ -148,7 +142,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> edit(BuildContext context, int index) async {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return AddPage(
+      return ConnectionAddPage(
         conn: _connections[index],
         index: index,
         edit: true,
@@ -158,7 +152,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> copy(BuildContext context, int index) async {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return AddPage(conn: _connections[index]);
+      return ConnectionAddPage(conn: _connections[index]);
     })).then((value) => refresh());
   }
 
@@ -193,23 +187,6 @@ class _HomePageState extends State<HomePage> {
             ));
   }
 
-  Future<void> ping(BuildContext context) async {
-    _pingEnabled = false;
-    _connectionPings.clear();
-    for (var i = 0; i < _connections.length; i++) {
-      var conn = _connections[i];
-      _connectionPings.add(await testPing(conn.host, int.parse(conn.port)));
-    }
-    Future.delayed(Duration(seconds: 1), () async {
-      refresh();
-      Future.delayed(Duration(seconds: 5), () async {
-        _connectionPings.clear();
-        refresh();
-        _pingEnabled = true;
-      });
-    });
-  }
-
   Future<void> start(BuildContext context, int index) async {
     EasyLoading.show(status: 'Connecting...');
     var _conn = _connections[index];
@@ -217,9 +194,9 @@ class _HomePageState extends State<HomePage> {
       conn.close();
       EasyLoading.dismiss();
       Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => MainPage(_conn, title: _conn.alias)));
+          builder: (context) => MySqlPage(_conn, title: _conn.alias)));
     }).onError((error, stackTrace) {
-      EasyLoading.showError('Connect: fail');
+      EasyLoading.showError('Connect: $error');
     });
   }
 }
