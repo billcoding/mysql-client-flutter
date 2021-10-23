@@ -1,18 +1,17 @@
 import 'dart:io';
-
-import 'package:dart_mysql/dart_mysql.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:mysql_client_flutter/model/connection.dart';
 import 'package:mysql_client_flutter/model/datatable.dart';
 import 'package:mysql_client_flutter/util/mysql.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 
 class QueryPage extends StatefulWidget {
-  final MySqlConnection conn;
+  final Connection conn;
   final String sql;
   QueryPage(this.conn, this.sql);
   @override
@@ -125,19 +124,11 @@ class _QueryPageState extends State<QueryPage> {
   var _resultSet = ResultSet(true, 0, []);
 
   Widget buildResults() {
-    return ListView(
-        padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 60),
-        children: [
-          Table(
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              border: TableBorder.all(color: Colors.blue),
-              children: _resultSet.data.map((r) {
-                return TableRow(
-                    children: r.map((c) {
-                  return buildTableCell('$c');
-                }).toList());
-              }).toList())
-        ]);
+    return ListView.builder(
+        itemCount: _resultSet.data.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Text(_resultSet.data[index].join('\t'));
+        });
   }
 
   Widget buildMessages() {
@@ -145,7 +136,7 @@ class _QueryPageState extends State<QueryPage> {
         padding: EdgeInsets.all(10),
         child: Text(
           _messages.join('\n'),
-          style: TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: 16, color: Colors.red),
         ));
   }
 
@@ -165,10 +156,12 @@ class _QueryPageState extends State<QueryPage> {
           });
           int end = DateTime.now().millisecondsSinceEpoch;
           var remain = end - start;
+          var nw = DateTime.now().toString().substring(0, 19);
           addMessage(
-              _resultSet.query
-                  ? '${DateTime.now()}: ${_resultSet.data.length - 1} rows retrieved in $remain ms.'
-                  : '${DateTime.now()}: ${_resultSet.affectedRows} affected rows in $remain ms.',
+              '[$nw]: ' +
+                  (_resultSet.query
+                      ? '${_resultSet.data.length - 1} rows retrieved in $remain ms.'
+                      : '${_resultSet.affectedRows} affected rows in $remain ms.'),
               append: true);
           EasyLoading.dismiss();
         } catch (e) {

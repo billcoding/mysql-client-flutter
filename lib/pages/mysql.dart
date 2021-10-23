@@ -43,16 +43,16 @@ class _MySqlPageState extends State<MySqlPage> {
   @override
   void initState() {
     super.initState();
-    chooseSchema('');
+    refreshAll('');
   }
 
-  void chooseSchema(String db) async {
+  Future<void> refreshAll(String db) async {
     if (db != '' && db != widget.conn.database) {
       widget.conn.database = db;
     }
     await open();
-    refreshSchemas();
-    refreshTables();
+    await refreshSchemas();
+    await refreshTables();
   }
 
   @override
@@ -63,6 +63,15 @@ class _MySqlPageState extends State<MySqlPage> {
           middle: Text(
             widget.title,
             style: TextStyle(color: Colors.black),
+          ),
+          trailing: GestureDetector(
+            child: Icon(Icons.refresh),
+            onTap: () async {
+              await EasyLoading.show(
+                  status: 'Refreshing...', dismissOnTap: true);
+              await refreshAll('');
+              await EasyLoading.dismiss();
+            },
           ),
         ),
         child: SafeArea(
@@ -123,7 +132,7 @@ class _MySqlPageState extends State<MySqlPage> {
                                       : FontWeight.normal,
                                   color: Colors.black),
                             ),
-                            onPressed: () => chooseSchema(t.name),
+                            onPressed: () => refreshAll(t.name),
                           ),
                         ),
                         Expanded(
@@ -151,7 +160,7 @@ class _MySqlPageState extends State<MySqlPage> {
             'New query',
             () => Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
-                  return QueryPage(this._conn!, '');
+                  return QueryPage(widget.conn, '');
                 }))),
         buildCupertinoFormButtonRow(
             'New table',
@@ -198,10 +207,9 @@ class _MySqlPageState extends State<MySqlPage> {
                             child: CupertinoButton(
                           padding: EdgeInsets.zero,
                           onPressed: () {
-                            print(_conn);
                             Navigator.of(context)
                                 .push(MaterialPageRoute(builder: (context) {
-                              return QueryPage(_conn!,
+                              return QueryPage(widget.conn,
                                   'SELECT t.* FROM ${t.tableName} AS t LIMIT 0, 100');
                             }));
                           },
@@ -212,18 +220,15 @@ class _MySqlPageState extends State<MySqlPage> {
                         Expanded(
                             child: CupertinoButton(
                           padding: EdgeInsets.zero,
-                          onPressed: () {},
-                          child: Icon(
-                            Icons.edit,
-                          ),
-                        )),
-                        Expanded(
-                            child: CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {},
-                          child: Icon(
-                            Icons.copy,
-                          ),
+                          onPressed: () async {
+                            var ddlSQL = await queryTableDDL(
+                                _conn!, _chooseSchema, t.tableName);
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(builder: (context) {
+                              return QueryPage(widget.conn, '$ddlSQL');
+                            }));
+                          },
+                          child: Icon(Icons.copy),
                         )),
                         Expanded(
                             child: CupertinoButton(
@@ -280,6 +285,9 @@ class _MySqlPageState extends State<MySqlPage> {
   }
 
   Future<void> open() async {
+    try {
+      await _conn!.close();
+    } catch (e) {}
     var conn = await widget.conn.connect();
     var results = await conn.query('select 1');
     if (results.length > 0) {
@@ -290,8 +298,16 @@ class _MySqlPageState extends State<MySqlPage> {
     Navigator.pop(context);
   }
 
+  String _chooseSchema = '';
   Future<void> refreshSchemas() async {
     var schemas = await querySchema(_conn!, widget.conn);
+    for (var i = 0; i < schemas.length; i++) {
+      var e = schemas[i];
+      if (e.choose) {
+        _chooseSchema = e.name;
+        break;
+      }
+    }
     _schemas.clear();
     setState(() {
       _schemas.addAll(schemas);

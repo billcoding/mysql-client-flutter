@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:excel/excel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,8 +6,6 @@ import 'package:mysql_client_flutter/model/connection.dart';
 import 'package:mysql_client_flutter/pages/connection_add.dart';
 import 'package:mysql_client_flutter/pages/mysql.dart';
 import 'package:mysql_client_flutter/strings/keys.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share/share.dart';
 import 'package:sp_util/sp_util.dart';
 
 class ConnectionPage extends StatefulWidget {

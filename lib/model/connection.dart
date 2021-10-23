@@ -23,7 +23,6 @@ class Connection {
       user: user,
       db: database,
       password: password,
-      timeout: Duration(seconds: 1),
     ));
   }
 
