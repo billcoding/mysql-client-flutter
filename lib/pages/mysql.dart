@@ -3,11 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
+import 'package:mysql_client_flutter/model/routine.dart';
 import 'package:mysql_client_flutter/model/schema.dart';
 import 'package:mysql_client_flutter/model/table.dart';
 import 'package:mysql_client_flutter/pages/query.dart';
+import 'package:mysql_client_flutter/pages/routine_info.dart';
 import 'package:mysql_client_flutter/pages/schema_info.dart';
-import 'package:mysql_client_flutter/pages/table_add.dart';
 import 'package:mysql_client_flutter/pages/table_info.dart';
 import 'package:mysql_client_flutter/util/mysql.dart';
 import 'package:mysql_client_flutter/widgets/widget.dart';
@@ -38,6 +39,7 @@ class _MySqlPageState extends State<MySqlPage> {
 
   List<Schema> _schemas = [];
   List<DBTable> _tables = [];
+  List<Routine> _routines = [];
   MySqlConnection? _conn;
 
   @override
@@ -53,6 +55,7 @@ class _MySqlPageState extends State<MySqlPage> {
     await open();
     await refreshSchemas();
     await refreshTables();
+    await refreshRoutines();
   }
 
   @override
@@ -162,12 +165,6 @@ class _MySqlPageState extends State<MySqlPage> {
                     .push(MaterialPageRoute(builder: (context) {
                   return QueryPage(widget.conn, '');
                 }))),
-        buildCupertinoFormButtonRow(
-            'New table',
-            () => Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) {
-                  return TableAddPage(widget.conn);
-                }))),
       ]),
       CupertinoFormSection(
           header: Text('TABLES'),
@@ -242,15 +239,73 @@ class _MySqlPageState extends State<MySqlPage> {
   }
 
   Widget buildRoutineTabView(BuildContext context) {
-    return CupertinoFormSection(header: Text('ROUTINES'), children: [
-      CupertinoFormRow(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        prefix: Text(
-          'proc_helloworld',
-          style: TextStyle(fontSize: 18),
-        ),
-        child: Text(''),
-      ),
+    return ListView(children: [
+      CupertinoFormSection(
+          header: Text('ROUTINES'),
+          children: _routines.isEmpty
+              ? [buildCupertinoFormNoDataRow('No routine found')]
+              : _routines.map((r) {
+                  return CupertinoFormRow(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Row(children: [
+                        Expanded(
+                          flex: 10,
+                          child: CupertinoButton(
+                            alignment: Alignment.centerLeft,
+                            padding: EdgeInsets.zero,
+                            child: Text(
+                              r.name,
+                              textAlign: TextAlign.left,
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            onPressed: () => {},
+                          ),
+                        ),
+                        Expanded(
+                            child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(builder: (context) {
+                              return RoutineInfoPage(r);
+                            }));
+                          },
+                          child: Icon(
+                            Icons.info_outline,
+                          ),
+                        )),
+                        Expanded(
+                            child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(builder: (context) {
+                              return QueryPage(widget.conn, r.callSQL);
+                            }));
+                          },
+                          child: Icon(
+                            Icons.play_arrow,
+                          ),
+                        )),
+                        Expanded(
+                            child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () async {
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(builder: (context) {
+                              return QueryPage(widget.conn, r.definitionSQL);
+                            }));
+                          },
+                          child: Icon(Icons.copy),
+                        )),
+                        Expanded(
+                            child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {},
+                          child: Text(''),
+                        )),
+                      ]));
+                }).toList())
     ]);
   }
 
@@ -319,6 +374,14 @@ class _MySqlPageState extends State<MySqlPage> {
     _tables.clear();
     setState(() {
       _tables.addAll(tables);
+    });
+  }
+
+  Future<void> refreshRoutines() async {
+    var routines = await queryRoutine(_conn!, widget.conn);
+    _routines.clear();
+    setState(() {
+      _routines.addAll(routines);
     });
   }
 }

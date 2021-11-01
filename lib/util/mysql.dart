@@ -1,6 +1,7 @@
 import 'package:dart_mysql/dart_mysql.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
 import 'package:mysql_client_flutter/model/datatable.dart';
+import 'package:mysql_client_flutter/model/routine.dart';
 import 'package:mysql_client_flutter/model/schema.dart';
 import 'package:mysql_client_flutter/model/table.dart';
 
@@ -79,6 +80,57 @@ order by t.TABLE_NAME asc
   return tables;
 }
 
+Future<List<Routine>> queryRoutine(
+    MySqlConnection mysqlConn, Connection conn) async {
+  var results = await mysqlConn.query('''
+select t.ROUTINE_CATALOG,
+       t.ROUTINE_NAME,
+       t.ROUTINE_SCHEMA,
+       t.SECURITY_TYPE,
+       t.CREATED,
+       t.SQL_MODE,
+       t.DEFINER,
+       t.CHARACTER_SET_CLIENT,
+       t.DATABASE_COLLATION,
+       t.ROUTINE_DEFINITION,
+       t.ROUTINE_COMMENT,
+       ifnull(p.ps, '') as ps,
+       ifnull(p.p, '') as p
+from information_schema.ROUTINES as t
+         left join (
+    select p.SPECIFIC_NAME,
+           group_concat(p.PARAMETER_NAME) as p,
+           group_concat(concat(p.PARAMETER_MODE, ' ', p.PARAMETER_NAME, ' ', p.DTD_IDENTIFIER)) as ps
+    from information_schema.PARAMETERS as p
+    where p.SPECIFIC_SCHEMA = ?
+    group by p.SPECIFIC_NAME
+) as p on p.SPECIFIC_NAME = t.SPECIFIC_NAME
+where t.ROUTINE_SCHEMA = ?
+  ''', [conn.database, conn.database]);
+  var routines = <Routine>[];
+  results.forEach((r) {
+    var definer = '${r[6]}';
+    definer = definer.replaceFirst("@", "@'") + "'";
+    var rt = Routine(
+      catalog: '${r[0]}',
+      name: '${r[1]}',
+      schema: '${r[2]}',
+      securityType: '${r[3]}',
+      createTime: '${r[4]}',
+      sqlMode: '${r[5]}',
+      definer: definer,
+      charset: '${r[7]}',
+      collation: '${r[8]}',
+      definition: '${r[9]}',
+      comment: '${r[10]}',
+      parameters: '${r[11]}',
+      parameterNames: '${r[12]}',
+    );
+    routines.add(rt);
+  });
+  return routines;
+}
+
 Future<String> queryTableDDL(
     MySqlConnection mysqlConn, String db, String table) async {
   var results = await mysqlConn.query("""
@@ -114,7 +166,7 @@ where t.TABLE_SCHEMA = ?
   AND t.TABLE_NAME = ?
 group by t.INDEX_NAME
   """, [db, table, db, table]);
-  var defines = <String>[];
+  var defines = [];
   results.forEach((r) {
     defines.add(r[0]);
   });

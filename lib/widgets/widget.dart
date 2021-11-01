@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-Widget buildCupertinoFormInfoRow(String name, String text) {
+Widget buildCupertinoFormInfoRow(String name, String text,
+    {TextAlign textAlign = TextAlign.right}) {
   return CupertinoFormRow(
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Row(children: [
@@ -9,7 +10,7 @@ Widget buildCupertinoFormInfoRow(String name, String text) {
         Expanded(
             flex: 3,
             child: Text(text,
-                style: TextStyle(fontSize: 16), textAlign: TextAlign.right)),
+                style: TextStyle(fontSize: 16), textAlign: textAlign)),
       ]));
 }
 
