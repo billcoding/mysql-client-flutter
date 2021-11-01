@@ -10,7 +10,7 @@ Widget buildCupertinoFormInfoRow(String name, String text,
         Expanded(
             flex: 3,
             child: Text(text,
-                style: TextStyle(fontSize: 16), textAlign: textAlign)),
+                style: TextStyle(fontSize: 14), textAlign: textAlign)),
       ]));
 }
 

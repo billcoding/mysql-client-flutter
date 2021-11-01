@@ -25,34 +25,33 @@ class _TableInfoPageState extends State<TableInfoPage> {
             child: ListView(children: [
           CupertinoFormSection(header: Text('TABLE Info.'), children: [
             buildCupertinoFormInfoRow(
-                'Table Catalog:', widget.table.tableCatalog),
+                'Table Catalog', widget.table.tableCatalog),
+            buildCupertinoFormInfoRow('Table Schema', widget.table.tableSchema),
+            buildCupertinoFormInfoRow('Table Name', widget.table.tableName),
+            buildCupertinoFormInfoRow('Table Type', widget.table.tableType),
             buildCupertinoFormInfoRow(
-                'Table Schema:', widget.table.tableSchema),
-            buildCupertinoFormInfoRow('Table Name:', widget.table.tableName),
-            buildCupertinoFormInfoRow('Table Type:', widget.table.tableType),
+                'Table Collation', widget.table.tableCollation),
             buildCupertinoFormInfoRow(
-                'Table Collation:', widget.table.tableCollation),
+                'Table Comment', widget.table.tableComment),
+            buildCupertinoFormInfoRow('Table Rows', widget.table.tableRows),
+            buildCupertinoFormInfoRow('Engine', widget.table.engine),
+            buildCupertinoFormInfoRow('Version', widget.table.version),
+            buildCupertinoFormInfoRow('Row Format', widget.table.rowFormat),
             buildCupertinoFormInfoRow(
-                'Table Comment:', widget.table.tableComment),
-            buildCupertinoFormInfoRow('Table Rows:', widget.table.tableRows),
-            buildCupertinoFormInfoRow('Engine:', widget.table.engine),
-            buildCupertinoFormInfoRow('Version:', widget.table.version),
-            buildCupertinoFormInfoRow('Row Format:', widget.table.rowFormat),
+                'Avg Row Length', widget.table.avgRowLength + ' Bytes'),
             buildCupertinoFormInfoRow(
-                'Avg Row Length:', widget.table.avgRowLength + ' Bytes'),
+                'Data Length', widget.table.dataLength + ' Bytes'),
             buildCupertinoFormInfoRow(
-                'Data Length:', widget.table.dataLength + ' Bytes'),
+                'Max Data Length', widget.table.maxDataLength + ' Bytes'),
             buildCupertinoFormInfoRow(
-                'Max Data Length:', widget.table.maxDataLength + ' Bytes'),
+                'Index Length', widget.table.indexLength + ' Bytes'),
             buildCupertinoFormInfoRow(
-                'Index Length:', widget.table.indexLength + ' Bytes'),
+                'Data Free', widget.table.dataFree + ' Bytes'),
             buildCupertinoFormInfoRow(
-                'Data Free:', widget.table.dataFree + ' Bytes'),
-            buildCupertinoFormInfoRow(
-                'Auto Increment:', widget.table.autoIncrement),
-            buildCupertinoFormInfoRow('Create Time:', widget.table.createTime),
-            buildCupertinoFormInfoRow('Update Time:', widget.table.updateTime),
-            buildCupertinoFormInfoRow('Check Time:', widget.table.checkTime),
+                'Auto Increment', widget.table.autoIncrement),
+            buildCupertinoFormInfoRow('Create Time', widget.table.createTime),
+            buildCupertinoFormInfoRow('Update Time', widget.table.updateTime),
+            buildCupertinoFormInfoRow('Check Time', widget.table.checkTime),
           ])
         ])));
   }

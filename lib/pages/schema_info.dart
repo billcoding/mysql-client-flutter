@@ -24,9 +24,9 @@ class _SchemaInfoPageState extends State<SchemaInfoPage> {
         child: SafeArea(
             child: ListView(children: [
           CupertinoFormSection(header: Text('SCHEMA Info.'), children: [
-            buildCupertinoFormInfoRow('Name:', widget.schema.name),
-            buildCupertinoFormInfoRow('Charset Name:', widget.schema.charset),
-            buildCupertinoFormInfoRow('Collate Name:', widget.schema.collate),
+            buildCupertinoFormInfoRow('Name', widget.schema.name),
+            buildCupertinoFormInfoRow('Charset Name', widget.schema.charset),
+            buildCupertinoFormInfoRow('Collate Name', widget.schema.collate),
           ])
         ])));
   }

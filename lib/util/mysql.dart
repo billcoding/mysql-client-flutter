@@ -1,6 +1,6 @@
 import 'package:dart_mysql/dart_mysql.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
-import 'package:mysql_client_flutter/model/datatable.dart';
+import 'package:mysql_client_flutter/model/resultset.dart';
 import 'package:mysql_client_flutter/model/routine.dart';
 import 'package:mysql_client_flutter/model/schema.dart';
 import 'package:mysql_client_flutter/model/table.dart';
@@ -180,13 +180,12 @@ Future<ResultSet> querySql(Connection _conn, String sql) async {
   var conn = await _conn.connect();
   var results = await conn.query(sql);
   var query = results.fields.isNotEmpty;
+  var header = <String>[];
   var data = <List<String>>[];
   if (query) {
-    var row = <String>[];
     results.fields.forEach((e) {
-      row.add(e.name!);
+      header.add(e.name!);
     });
-    data.add(row);
     results.forEach((e) {
       var row = <String>[];
       for (var item in e) {
@@ -196,5 +195,5 @@ Future<ResultSet> querySql(Connection _conn, String sql) async {
     });
   }
   await conn.close();
-  return ResultSet(query, query ? 0 : results.affectedRows!, data);
+  return ResultSet(query, query ? 0 : results.affectedRows!, header, data);
 }

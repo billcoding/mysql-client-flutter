@@ -25,23 +25,22 @@ class _RoutineInfoPageState extends State<RoutineInfoPage> {
             child: ListView(children: [
           CupertinoFormSection(header: Text('Routine Info.'), children: [
             buildCupertinoFormInfoRow(
-                'Routine Catalog:', widget.routine.catalog),
-            buildCupertinoFormInfoRow('Routine Schema:', widget.routine.schema),
-            buildCupertinoFormInfoRow('Routine Name:', widget.routine.name),
+                'Routine Catalog', widget.routine.catalog),
+            buildCupertinoFormInfoRow('Routine Schema', widget.routine.schema),
+            buildCupertinoFormInfoRow('Routine Name', widget.routine.name),
             buildCupertinoFormInfoRow(
-                'Routine Security Type:', widget.routine.securityType),
+                'Routine Security Type', widget.routine.securityType),
             buildCupertinoFormInfoRow(
-                'Routine Collation:', widget.routine.collation),
+                'Routine Collation', widget.routine.collation),
             buildCupertinoFormInfoRow(
-                'Routine Comment:', widget.routine.comment),
-            buildCupertinoFormInfoRow('Charset Name:', widget.routine.charset),
-            buildCupertinoFormInfoRow('SQL Mode:', widget.routine.sqlMode),
+                'Routine Comment', widget.routine.comment),
+            buildCupertinoFormInfoRow('Charset Name', widget.routine.charset),
+            buildCupertinoFormInfoRow('SQL Mode', widget.routine.sqlMode),
             buildCupertinoFormInfoRow(
-                'Routine Parameter:', widget.routine.parameters),
+                'Routine Parameter', widget.routine.parameters),
+            buildCupertinoFormInfoRow('Create Time', widget.routine.createTime),
             buildCupertinoFormInfoRow(
-                'Create Time:', widget.routine.createTime),
-            buildCupertinoFormInfoRow(
-                'Routine definition:', widget.routine.definition,
+                'Routine definition', widget.routine.definition,
                 textAlign: TextAlign.left),
           ])
         ])));

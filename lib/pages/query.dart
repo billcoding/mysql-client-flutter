@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
-import 'package:mysql_client_flutter/model/datatable.dart';
+import 'package:mysql_client_flutter/model/resultset.dart';
 import 'package:mysql_client_flutter/util/mysql.dart';
+import 'package:mysql_client_flutter/widgets/widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 
@@ -33,6 +34,7 @@ class _QueryPageState extends State<QueryPage> {
   ];
   int _buttonIndex = 0;
   final _buttons = ['Run', 'Done', 'Export', 'Clear'];
+  int _resultIndex = 0;
 
   void setButtonIndex(int index) {
     setState(() {
@@ -121,14 +123,107 @@ class _QueryPageState extends State<QueryPage> {
     ));
   }
 
-  var _resultSet = ResultSet(true, 0, []);
+  var _resultSet = ResultSet(true, 0, [], []);
+  var _gotoController = TextEditingController();
+  Widget buildResultItem() {
+    var rs = <Widget>[];
+    var cs = _resultSet.data[_resultIndex];
+    for (var i = 0; i < _resultSet.header.length; i++) {
+      rs.add(buildCupertinoFormInfoRow(_resultSet.header[i], cs[i]));
+    }
+    return ListView(children: [
+      CupertinoFormSection(
+          header: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          child: Icon(
+                            CupertinoIcons.home,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _resultIndex = 0;
+                            });
+                          }),
+                    ),
+                    Expanded(
+                      child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          child: Icon(CupertinoIcons.arrow_left),
+                          onPressed: () {
+                            if (_resultIndex > 0) {
+                              setState(() {
+                                _resultIndex--;
+                              });
+                            }
+                          }),
+                    ),
+                    Expanded(
+                      child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          child: Icon(CupertinoIcons.arrow_right),
+                          onPressed: () {
+                            if (_resultIndex < _resultSet.data.length - 1) {
+                              setState(() {
+                                _resultIndex++;
+                              });
+                            }
+                          }),
+                    ),
+                    Expanded(
+                      child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          child: Icon(CupertinoIcons.forward_end),
+                          onPressed: () {
+                            setState(() {
+                              _resultIndex = _resultSet.data.length - 1;
+                            });
+                          }),
+                    ),
+                    Expanded(
+                      child: CupertinoTextField(
+                        placeholder: '10',
+                        controller: _gotoController,
+                        keyboardType: TextInputType.number,
+                        padding: EdgeInsets.zero,
+                        textAlign: TextAlign.center,
+                        onEditingComplete: () {
+                          if (_gotoController.text == '') {
+                            return;
+                          }
+                          try {
+                            var goto = int.parse(_gotoController.text);
+                            if (goto >= 1 && goto <= _resultSet.data.length) {
+                              setState(() {
+                                _resultIndex = goto - 1;
+                              });
+                            }
+                            FocusManager.instance.primaryFocus!.unfocus();
+                          } catch (e) {}
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  'Results ${_resultIndex + 1} of ${_resultSet.data.length}',
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ],
+          ),
+          children: rs)
+    ]);
+  }
 
   Widget buildResults() {
-    return ListView.builder(
-        itemCount: _resultSet.data.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Text(_resultSet.data[index].join('\t'));
-        });
+    return _resultSet.data.length == 0 ? Text('') : buildResultItem();
   }
 
   Widget buildMessages() {
@@ -157,7 +252,7 @@ class _QueryPageState extends State<QueryPage> {
       addMessage(
           '[$nw]: ' +
               (_resultSet.query
-                  ? '${_resultSet.data.length - 1} rows retrieved in $remain ms.'
+                  ? '${_resultSet.data.length} rows retrieved in $remain ms.'
                   : '${_resultSet.affectedRows} affected rows in $remain ms.'),
           append: true);
       EasyLoading.dismiss();
