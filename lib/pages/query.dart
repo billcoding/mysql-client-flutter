@@ -140,34 +140,41 @@ class _QueryPageState extends State<QueryPage> {
         ));
   }
 
+  void executeSQL(String sql) async {
+    if (sql == '') return;
+    try {
+      EasyLoading.show(
+        status: 'Executing...',
+      );
+      int start = DateTime.now().millisecondsSinceEpoch;
+      var rs = await querySql(widget.conn, sql);
+      setState(() {
+        _resultSet = rs;
+      });
+      int end = DateTime.now().millisecondsSinceEpoch;
+      var remain = end - start;
+      var nw = DateTime.now().toString().substring(0, 19);
+      addMessage(
+          '[$nw]: ' +
+              (_resultSet.query
+                  ? '${_resultSet.data.length - 1} rows retrieved in $remain ms.'
+                  : '${_resultSet.affectedRows} affected rows in $remain ms.'),
+          append: true);
+      EasyLoading.dismiss();
+    } catch (e) {
+      addMessage('$e', append: true);
+      EasyLoading.showError('$e', duration: Duration(seconds: 1));
+    }
+  }
+
   void onPressed(BuildContext context) async {
     switch (_buttonIndex) {
       case 0: // Run
         var sql = _textController.text;
         if (sql == '') return;
-        try {
-          EasyLoading.show(
-            status: 'Executing...',
-          );
-          int start = DateTime.now().millisecondsSinceEpoch;
-          var rs = await querySql(widget.conn, sql);
-          setState(() {
-            _resultSet = rs;
-          });
-          int end = DateTime.now().millisecondsSinceEpoch;
-          var remain = end - start;
-          var nw = DateTime.now().toString().substring(0, 19);
-          addMessage(
-              '[$nw]: ' +
-                  (_resultSet.query
-                      ? '${_resultSet.data.length - 1} rows retrieved in $remain ms.'
-                      : '${_resultSet.affectedRows} affected rows in $remain ms.'),
-              append: true);
-          EasyLoading.dismiss();
-        } catch (e) {
-          addMessage('$e', append: true);
-          EasyLoading.showError('$e', duration: Duration(seconds: 1));
-        }
+        sql.split(';').forEach((sql) {
+          executeSQL(sql);
+        });
         break;
       case 1: // Done
         FocusManager.instance.primaryFocus!.unfocus();
