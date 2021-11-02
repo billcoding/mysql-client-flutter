@@ -276,23 +276,25 @@ class _QueryPageState extends State<QueryPage> {
         break;
       case 2: // Export
         if (_resultSet.query && _resultSet.data.isNotEmpty) {
-          var r = PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                ResultsExportPage(_resultSet),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(0.0, 1.0);
-              const end = Offset.zero;
-              const curve = Curves.ease;
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
-            },
-          );
-          Navigator.of(context).push(r);
+          // var r = PageRouteBuilder(
+          //   pageBuilder: (context, animation, secondaryAnimation) =>
+          //       ResultsExportPage(_resultSet),
+          //   transitionsBuilder:
+          //       (context, animation, secondaryAnimation, child) {
+          //     const begin = Offset(0.0, 1.0);
+          //     const end = Offset.zero;
+          //     const curve = Curves.ease;
+          //     var tween =
+          //         Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          //     return SlideTransition(
+          //       position: animation.drive(tween),
+          //       child: child,
+          //     );
+          //   },
+          // );
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return ResultsExportPage(_resultSet);
+          }));
         }
         break;
       case 3: // Clear

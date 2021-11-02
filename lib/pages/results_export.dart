@@ -39,9 +39,10 @@ class _ResultsExportPageState extends State<ResultsExportPage> {
     return CupertinoPageScaffold(
       backgroundColor: Colors.grey[200],
       navigationBar: CupertinoNavigationBar(
+        middle: Text('Export'),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Text('Export'),
+          child: Text('Save'),
           onPressed: startExport,
         ),
       ),
@@ -58,7 +59,7 @@ class _ResultsExportPageState extends State<ResultsExportPage> {
         padding: EdgeInsets.only(left: 20),
         child: Row(children: [
           Expanded(
-            flex: 7,
+            flex: 9,
             child: CupertinoButton(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.zero,
