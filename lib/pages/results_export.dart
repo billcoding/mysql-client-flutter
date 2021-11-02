@@ -165,13 +165,12 @@ class _ResultsExportPageState extends State<ResultsExportPage> {
         String str = 'insert into table (' +
             widget.resultSet.header.join(',') +
             ') values ';
-        int c = 0;
         String str2 = '';
         widget.resultSet.data.forEach((e) {
+          str2 += "('" + e.join("','") + "')";
           if (str2 != '') {
-            str2 += ',';
+            str2 += ',\n';
           }
-          str2 += "('" + e.join("','") + "')\n";
         });
         str += str2 + ";";
         bytes = Utf8Encoder().convert(str);
