@@ -32,8 +32,6 @@ class _RoutineInfoPageState extends State<RoutineInfoPage> {
                 'Routine Security Type', widget.routine.securityType),
             buildCupertinoFormInfoRow(
                 'Routine Collation', widget.routine.collation),
-            buildCupertinoFormInfoRow(
-                'Routine Comment', widget.routine.comment),
             buildCupertinoFormInfoRow('Charset Name', widget.routine.charset),
             buildCupertinoFormInfoRow('SQL Mode', widget.routine.sqlMode),
             buildCupertinoFormInfoRow(

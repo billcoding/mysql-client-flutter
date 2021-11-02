@@ -1,15 +1,12 @@
-import 'dart:io';
-import 'package:excel/excel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
 import 'package:mysql_client_flutter/model/resultset.dart';
+import 'package:mysql_client_flutter/pages/results_export.dart';
 import 'package:mysql_client_flutter/util/mysql.dart';
 import 'package:mysql_client_flutter/widgets/widget.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share/share.dart';
 
 class QueryPage extends StatefulWidget {
   final Connection conn;
@@ -223,7 +220,9 @@ class _QueryPageState extends State<QueryPage> {
   }
 
   Widget buildResults() {
-    return _resultSet.data.length == 0 ? Text('') : buildResultItem();
+    return _resultSet.data.length == 0
+        ? Center(child: Text('No results'))
+        : buildResultItem();
   }
 
   Widget buildMessages() {
@@ -277,17 +276,23 @@ class _QueryPageState extends State<QueryPage> {
         break;
       case 2: // Export
         if (_resultSet.query && _resultSet.data.isNotEmpty) {
-          var excel = Excel.createExcel();
-          var sheet = excel.sheets['Sheet1'];
-          _resultSet.data.forEach((e) {
-            sheet!.appendRow(e);
-          });
-          var docDir = await getApplicationDocumentsDirectory();
-          var bytes = excel.save();
-          var f = File("${docDir.path}/query_output.xlsx")
-            ..create(recursive: true)
-            ..writeAsBytes(bytes!);
-          await Share.shareFiles([f.path]);
+          var r = PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                ResultsExportPage(_resultSet),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 1.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+          );
+          Navigator.of(context).push(r);
         }
         break;
       case 3: // Clear

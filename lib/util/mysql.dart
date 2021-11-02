@@ -93,7 +93,6 @@ select t.ROUTINE_CATALOG,
        t.CHARACTER_SET_CLIENT,
        t.DATABASE_COLLATION,
        t.ROUTINE_DEFINITION,
-       t.ROUTINE_COMMENT,
        ifnull(p.ps, '') as ps,
        ifnull(p.p, '') as p
 from information_schema.ROUTINES as t
@@ -122,9 +121,8 @@ where t.ROUTINE_SCHEMA = ?
       charset: '${r[7]}',
       collation: '${r[8]}',
       definition: '${r[9]}',
-      comment: '${r[10]}',
-      parameters: '${r[11]}',
-      parameterNames: '${r[12]}',
+      parameters: '${r[10]}',
+      parameterNames: '${r[11]}',
     );
     routines.add(rt);
   });

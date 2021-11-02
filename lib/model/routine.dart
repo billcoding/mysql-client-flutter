@@ -9,7 +9,6 @@ class Routine {
   final String charset;
   final String collation;
   final String definition;
-  final String comment;
   final String parameters;
   final String parameterNames;
   Routine({
@@ -23,7 +22,6 @@ class Routine {
     required this.charset,
     required this.collation,
     required this.definition,
-    required this.comment,
     required this.parameters,
     required this.parameterNames,
   });
@@ -31,7 +29,6 @@ class Routine {
   get callSQL => ("""CALL $name($parameterNames);""");
   get definitionSQL => ("""
     CREATE DEFINER = $definer PROCEDURE $name($parameters)
-COMMENT '$comment'
 $definition
 """);
 }
