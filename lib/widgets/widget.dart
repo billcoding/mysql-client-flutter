@@ -6,7 +6,10 @@ Widget buildCupertinoFormInfoRow(String name, String text,
   return CupertinoFormRow(
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Row(children: [
-        Expanded(flex: 2, child: Text(name, style: TextStyle(fontSize: 16))),
+        Expanded(
+            flex: 2,
+            child: Text(name,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
         Expanded(
             flex: 3,
             child: Text(text,

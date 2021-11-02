@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:flutter/cupertino.dart';
@@ -109,7 +110,7 @@ class _ResultsExportPageState extends State<ResultsExportPage> {
         widget.resultSet.data.forEach((e) {
           str += e.join(',') + '\n';
         });
-        bytes = str.codeUnits;
+        bytes = Utf8Encoder().convert(str);
         filename = 'export.csv';
         break;
       case 2:
@@ -128,10 +129,7 @@ class _ResultsExportPageState extends State<ResultsExportPage> {
           str += """{${items.join(',')}}""";
           str += "\n";
         }
-        bytes = '''[
-$str
-]'''
-            .codeUnits;
+        bytes = Utf8Encoder().convert('''[$str]''');
         filename = 'export.json';
         break;
       case 3:
@@ -146,10 +144,7 @@ $str
           }
           str += '</Item>\n';
         }
-        bytes = '''<root>
-$str
-</root>'''
-            .codeUnits;
+        bytes = Utf8Encoder().convert('''<root>$str</root>''');
         filename = 'export.xml';
         break;
       case 4:
@@ -161,23 +156,24 @@ $str
         widget.resultSet.data.forEach((e) {
           str += columnSql + "'" + e.join("','") + "');\n";
         });
-        bytes = str.codeUnits;
+        bytes = Utf8Encoder().convert(str);
         filename = 'export.sql';
         break;
-      case 4:
+      case 5:
         // Batch Insert SQL
         String str = 'insert into table (' +
             widget.resultSet.header.join(',') +
             ') values ';
         int c = 0;
+        String str2 = '';
         widget.resultSet.data.forEach((e) {
-          c++;
-          if (c == 2) {
-            str += ',';
+          if (str2 != '') {
+            str2 += ',';
           }
-          str += "('" + e.join("','") + "')\n";
+          str2 += "('" + e.join("','") + "')\n";
         });
-        bytes = str.codeUnits;
+        str += str2 + ";";
+        bytes = Utf8Encoder().convert(str);
         filename = 'export.sql';
         break;
     }
