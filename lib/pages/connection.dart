@@ -5,6 +5,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
 import 'package:mysql_client_flutter/pages/connection_add.dart';
 import 'package:mysql_client_flutter/pages/mysql.dart';
+import 'package:mysql_client_flutter/pages/settings.dart';
 import 'package:mysql_client_flutter/strings/keys.dart';
 import 'package:sp_util/sp_util.dart';
 
@@ -28,11 +29,16 @@ class _ConnectionPageState extends State<ConnectionPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-        backgroundColor: Colors.grey[200],
         navigationBar: CupertinoNavigationBar(
           middle: Text('Connections', style: TextStyle(color: Colors.black)),
           leading: GestureDetector(
-              child: Icon(Icons.settings_outlined), onTap: () async {}),
+              child: Icon(Icons.settings_outlined),
+              onTap: () async {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) {
+                  return SettingsPage();
+                }));
+              }),
           trailing: GestureDetector(
             child: Icon(CupertinoIcons.add),
             onTap: () async => Navigator.of(context)

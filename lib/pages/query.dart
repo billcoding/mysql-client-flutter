@@ -59,7 +59,6 @@ class _QueryPageState extends State<QueryPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-        backgroundColor: Colors.grey[200],
         navigationBar: CupertinoNavigationBar(
           middle: Text(
             'Query',
@@ -276,22 +275,6 @@ class _QueryPageState extends State<QueryPage> {
         break;
       case 2: // Export
         if (_resultSet.query && _resultSet.data.isNotEmpty) {
-          // var r = PageRouteBuilder(
-          //   pageBuilder: (context, animation, secondaryAnimation) =>
-          //       ResultsExportPage(_resultSet),
-          //   transitionsBuilder:
-          //       (context, animation, secondaryAnimation, child) {
-          //     const begin = Offset(0.0, 1.0);
-          //     const end = Offset.zero;
-          //     const curve = Curves.ease;
-          //     var tween =
-          //         Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          //     return SlideTransition(
-          //       position: animation.drive(tween),
-          //       child: child,
-          //     );
-          //   },
-          // );
           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
             return ResultsExportPage(_resultSet);
           }));

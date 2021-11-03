@@ -11,20 +11,20 @@ class Routine {
   final String definition;
   final String parameters;
   final String parameterNames;
-  Routine({
-    required this.catalog,
-    required this.name,
-    required this.schema,
-    required this.securityType,
-    required this.createTime,
-    required this.sqlMode,
-    required this.definer,
-    required this.charset,
-    required this.collation,
-    required this.definition,
-    required this.parameters,
-    required this.parameterNames,
-  });
+  Routine(
+    this.catalog,
+    this.name,
+    this.schema,
+    this.securityType,
+    this.createTime,
+    this.sqlMode,
+    this.definer,
+    this.charset,
+    this.collation,
+    this.definition,
+    this.parameters,
+    this.parameterNames,
+  );
 
   get callSQL => ("""CALL $name($parameterNames);""");
   get definitionSQL => ("""

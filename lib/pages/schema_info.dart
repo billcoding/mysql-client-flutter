@@ -14,7 +14,6 @@ class _SchemaInfoPageState extends State<SchemaInfoPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-        backgroundColor: Colors.grey[200],
         navigationBar: CupertinoNavigationBar(
           middle: Text(
             widget.schema.name,

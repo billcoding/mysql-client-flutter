@@ -1,12 +1,12 @@
 import 'package:dart_mysql/dart_mysql.dart';
 
 class Connection {
-  String host;
-  String port;
-  String user;
-  String password;
+  final String host;
+  final String port;
+  final String user;
+  final String password;
   String database;
-  String alias;
+  final String alias;
   Connection(
     this.host,
     this.port,

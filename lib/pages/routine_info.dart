@@ -14,7 +14,6 @@ class _RoutineInfoPageState extends State<RoutineInfoPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-        backgroundColor: Colors.grey[200],
         navigationBar: CupertinoNavigationBar(
           middle: Text(
             widget.routine.name,

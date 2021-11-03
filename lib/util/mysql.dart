@@ -4,6 +4,7 @@ import 'package:mysql_client_flutter/model/resultset.dart';
 import 'package:mysql_client_flutter/model/routine.dart';
 import 'package:mysql_client_flutter/model/schema.dart';
 import 'package:mysql_client_flutter/model/table.dart';
+import 'package:mysql_client_flutter/model/view.dart';
 
 Future<List<Schema>> querySchema(
     MySqlConnection mysqlConn, Connection conn) async {
@@ -48,36 +49,54 @@ select t.TABLE_CATALOG,
       t.CREATE_OPTIONS
 from information_schema.TABLES as t
 where t.TABLE_SCHEMA = ?
-  and t.ENGINE is not null
+  and t.TABLE_TYPE = 'BASE TABLE'
 order by t.TABLE_NAME asc
   ''', [conn.database]);
   var tables = <DBTable>[];
   results.forEach((r) {
     var dbt = DBTable(
-      tableCatalog: '${r[0]}',
-      tableSchema: '${r[1]}',
-      tableName: '${r[2]}',
-      tableType: '${r[3]}',
-      tableCollation: '${r[4]}',
-      tableComment: '${r[5]}',
-      tableRows: '${r[6]}',
-      engine: '${r[7]}',
-      version: '${r[8]}',
-      rowFormat: '${r[9]}',
-      avgRowLength: '${r[10]}',
-      dataLength: '${r[11]}',
-      maxDataLength: '${r[12]}',
-      indexLength: '${r[13]}',
-      dataFree: '${r[14]}',
-      autoIncrement: '${r[15]}',
-      createTime: '${r[16]}',
-      updateTime: '${r[17]}',
-      checkTime: '${r[18]}',
-      createOptions: '${r[19]}',
+      '${r[0]}',
+      '${r[1]}',
+      '${r[2]}',
+      '${r[3]}',
+      '${r[4]}',
+      '${r[5]}',
+      '${r[6]}',
+      '${r[7]}',
+      '${r[8]}',
+      '${r[9]}',
+      '${r[10]}',
+      '${r[11]}',
+      '${r[12]}',
+      '${r[13]}',
+      '${r[14]}',
+      '${r[15]}',
+      '${r[16]}',
+      '${r[17]}',
+      '${r[18]}',
+      '${r[19]}',
     );
     tables.add(dbt);
   });
   return tables;
+}
+
+Future<List<View>> queryView(MySqlConnection mysqlConn, Connection conn) async {
+  var results = await mysqlConn.query('''
+select t.TABLE_CATALOG,
+      t.TABLE_SCHEMA,
+      t.TABLE_NAME
+from information_schema.TABLES as t
+where t.TABLE_SCHEMA = ?
+  and t.TABLE_TYPE = 'VIEW'
+order by t.TABLE_NAME asc
+  ''', [conn.database]);
+  var views = <View>[];
+  results.forEach((r) {
+    var v = View(catalog: '${r[0]}', schema: '${r[1]}', name: '${r[2]}');
+    views.add(v);
+  });
+  return views;
 }
 
 Future<List<Routine>> queryRoutine(
@@ -111,18 +130,18 @@ where t.ROUTINE_SCHEMA = ?
     var definer = '${r[6]}';
     definer = definer.replaceFirst("@", "@'") + "'";
     var rt = Routine(
-      catalog: '${r[0]}',
-      name: '${r[1]}',
-      schema: '${r[2]}',
-      securityType: '${r[3]}',
-      createTime: '${r[4]}',
-      sqlMode: '${r[5]}',
-      definer: definer,
-      charset: '${r[7]}',
-      collation: '${r[8]}',
-      definition: '${r[9]}',
-      parameters: '${r[10]}',
-      parameterNames: '${r[11]}',
+      '${r[0]}',
+      '${r[1]}',
+      '${r[2]}',
+      '${r[3]}',
+      '${r[4]}',
+      '${r[5]}',
+      definer,
+      '${r[7]}',
+      '${r[8]}',
+      '${r[9]}',
+      '${r[10]}',
+      '${r[11]}',
     );
     routines.add(rt);
   });

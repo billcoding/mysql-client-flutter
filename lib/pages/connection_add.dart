@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
 import 'package:mysql_client_flutter/strings/keys.dart';
 import 'package:mysql_client_flutter/util/toast.dart';
+import 'package:mysql_client_flutter/widgets/widget.dart';
 import 'package:sp_util/sp_util.dart';
 
 class ConnectionAddPage extends StatefulWidget {
@@ -27,8 +28,6 @@ class _ConnectionAddPageState extends State<ConnectionAddPage> {
   bool _saveEnabled = true;
   bool _testEnabled = true;
   GlobalKey<FormState> _formKey = GlobalKey();
-
-  _ConnectionAddPageState();
 
   @override
   void initState() {
@@ -57,13 +56,11 @@ class _ConnectionAddPageState extends State<ConnectionAddPage> {
           ),
           trailing: null,
         ),
-        backgroundColor: Colors.grey[200],
         child: SafeArea(
             child: ListView(children: [
           Form(
               key: _formKey,
               autovalidateMode: AutovalidateMode.always,
-              onChanged: () async => {},
               child: Column(children: [
                 buildCupertinoFormSection('CONNECTION', [
                   buildTextField('Host/IP', _hostController,
@@ -102,29 +99,6 @@ class _ConnectionAddPageState extends State<ConnectionAddPage> {
     return CupertinoFormSection(
       header: Text(headerText),
       children: children,
-    );
-  }
-
-  Widget buildTextField(String text, TextEditingController? controller,
-      {bool password = false,
-      TextInputType keyboardType = TextInputType.text,
-      int maxLength = 50,
-      required String placeholder}) {
-    return CupertinoTextFormFieldRow(
-      prefix: Text(text),
-      obscureText: password,
-      keyboardType: keyboardType,
-      textAlign: TextAlign.right,
-      controller: controller,
-      maxLength: maxLength,
-      maxLines: 1,
-      decoration: null,
-      placeholder: placeholder,
-      validator: (String? value) {
-        return value == null || value.isEmpty
-            ? 'Please enter this field.'
-            : null;
-      },
     );
   }
 

@@ -165,7 +165,6 @@ class _ResultsExportPageState extends State<ResultsExportPage> {
         String str = 'insert into table (' +
             widget.resultSet.header.join(',') +
             ') values ';
-        int c = 0;
         String str2 = '';
         widget.resultSet.data.forEach((e) {
           if (str2 != '') {

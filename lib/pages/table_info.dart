@@ -14,7 +14,6 @@ class _TableInfoPageState extends State<TableInfoPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-        backgroundColor: Colors.grey[200],
         navigationBar: CupertinoNavigationBar(
           middle: Text(
             widget.table.tableName,
