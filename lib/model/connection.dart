@@ -26,13 +26,16 @@ class Connection {
     ));
   }
 
-  Connection.fromJson(Map<dynamic, dynamic> map)
-      : host = map["host"],
-        port = map["port"],
-        user = map["user"],
-        password = map["password"],
-        database = map["database"],
-        alias = map["alias"];
+  factory Connection.fromJson(dynamic json) {
+    return Connection(
+      json["host"] as String,
+      json["port"] as String,
+      json["user"] as String,
+      json["password"] as String,
+      json["database"] as String,
+      json["alias"] as String,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {

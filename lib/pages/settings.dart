@@ -4,7 +4,7 @@ import 'package:mailto/mailto.dart';
 import 'package:mysql_client_flutter/pages/data_export.dart';
 import 'package:mysql_client_flutter/pages/data_import.dart';
 import 'package:mysql_client_flutter/pages/snippet.dart';
-import 'package:mysql_client_flutter/strings/owner.dart';
+import 'package:mysql_client_flutter/strings/vendor.dart';
 import 'package:mysql_client_flutter/widgets/widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -51,37 +51,20 @@ class _SettingsPageState extends State<SettingsPage> {
             CupertinoFormSection(
               header: Text('ABOUT'),
               children: [
-                buildCupertinoFormButtonRow('Contact us', () async {
-                  final mailtoLink = Mailto(to: [email], subject: emailSubject);
-                  await launch('$mailtoLink');
-                }),
-                buildCupertinoFormButtonRow('Visit project', () async {
-                  await launch(repoURL);
-                }),
-                buildCupertinoFormButtonRow('Request issue', () async {
-                  await launch(issuesURL);
-                }),
+                buildCupertinoFormButtonRow(
+                    'Visit project', () async => await launch(repoURL)),
+                buildCupertinoFormButtonRow(
+                    'Request issue', () async => await launch(issuesURL)),
+                buildCupertinoFormButtonRow(
+                    'Contact us', () async => await launch(mailTo)),
               ],
-              footer: Container(
-                padding: EdgeInsets.only(top: 10),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Version 1.0.0',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Copyright @2021',
-                        style: TextStyle(fontSize: 14),
-                        textAlign: TextAlign.right,
-                      ),
-                    )
-                  ],
-                ),
-              ),
+            ),
+            CupertinoFormSection(
+              header: Text('COPYRIGHT'),
+              children: [
+                buildCupertinoFormInfoRow('Version', version),
+                buildCupertinoFormInfoRow('Copyright', copyright),
+              ],
             )
           ],
         )));

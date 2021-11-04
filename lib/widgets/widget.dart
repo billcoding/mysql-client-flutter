@@ -3,17 +3,24 @@ import 'package:flutter/material.dart';
 
 Widget buildCupertinoFormInfoRow(String name, String text,
     {TextAlign textAlign = TextAlign.right}) {
+  return buildCupertinoStdRow(
+      name, Text(text, style: TextStyle(fontSize: 14), textAlign: textAlign));
+}
+
+Widget buildCupertinoStdRow(String name, Widget right,
+    {TextAlign textAlign = TextAlign.right, bool verticalPad = true}) {
   return CupertinoFormRow(
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      padding:
+          EdgeInsets.symmetric(vertical: verticalPad ? 10 : 0, horizontal: 20),
       child: Row(children: [
         Expanded(
-            flex: 2,
-            child: Text(name,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500))),
-        Expanded(
-            flex: 3,
-            child: Text(text,
-                style: TextStyle(fontSize: 14), textAlign: textAlign)),
+          flex: 2,
+          child: Text(
+            name,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ),
+        Expanded(flex: 3, child: right),
       ]));
 }
 

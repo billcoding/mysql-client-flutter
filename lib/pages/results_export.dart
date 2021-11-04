@@ -59,10 +59,11 @@ class _ResultsExportPageState extends State<ResultsExportPage> {
         padding: EdgeInsets.only(left: 20),
         child: Row(children: [
           Expanded(
-            flex: 9,
+            flex: 6,
             child: CupertinoButton(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.zero,
+              pressedOpacity: 1.0,
               child: Text(
                 text,
                 style: TextStyle(
@@ -79,12 +80,20 @@ class _ResultsExportPageState extends State<ResultsExportPage> {
               child: _index == index
                   ? CupertinoButton(
                       padding: EdgeInsets.zero,
+                      pressedOpacity: 1.0,
                       onPressed: () {},
                       child: Icon(
                         Icons.check_outlined,
                       ),
                     )
-                  : Text('')),
+                  : CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: Text(''),
+                      onPressed: () async {
+                        setState(() {
+                          _index = index;
+                        });
+                      })),
         ]));
   }
 
