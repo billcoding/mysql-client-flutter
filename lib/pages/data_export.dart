@@ -1,5 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:mysql_client_flutter/model/connection.dart';
+import 'package:mysql_client_flutter/model/snippet.dart';
+import 'package:mysql_client_flutter/strings/keys.dart';
+import 'package:mysql_client_flutter/util/toast.dart';
+import 'package:mysql_client_flutter/widgets/widget.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share/share.dart';
+import 'package:sp_util/sp_util.dart';
 
 class DataExportPage extends StatefulWidget {
   const DataExportPage({Key? key}) : super(key: key);
@@ -13,59 +25,72 @@ class _DataExportPageState extends State<DataExportPage> {
     super.initState();
   }
 
-  List<String> _dataTypes = [
-    'Connections',
-    'Snippets',
-  ];
+  List<String> _dataTypes = ['Connections', 'Snippets'];
 
-  List<String> _fileTypes = [
-    'JSON(*.json)',
-    'XML(*.xml)',
-  ];
-  int _i1 = -1;
-  int _i2 = -1;
-  int _index1 = 0;
-  int _index2 = 0;
-
+  int _i = -1;
+  int _index = 0;
+  bool switchValue = false;
   @override
   Widget build(BuildContext context) {
-    _i1 = -1;
-    _i2 = -1;
+    _i = -1;
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text('Data Export'),
+        middle: Text('Export'),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Text('Export'),
-          onPressed: () async {},
+          child: Text('Save'),
+          onPressed: () async {
+            var docDir = await getApplicationDocumentsDirectory();
+            var json = '';
+            var fileName = '';
+            switch (_index) {
+              case 0:
+                // Connection
+                json = jsonEncode(SpUtil.getObjList(
+                    Keys.connections, (map) => Connection.fromJson(map)));
+                fileName = 'connections.json';
+                break;
+              case 1:
+                // Snippet
+                // Connection
+                json = jsonEncode(SpUtil.getObjList(
+                    Keys.snippets, (map) => Snippet.fromJson(map)));
+                fileName = 'snippets.json';
+                break;
+            }
+            var f = File('${docDir.path}/$fileName');
+            if (!await f.exists()) {
+              await f.create();
+            }
+            await f.writeAsString(json);
+            await Share.shareFiles(
+              [f.path],
+            );
+          },
         ),
       ),
       child: SafeArea(
           child: ListView(
         children: [
           CupertinoFormSection(
-              header: Text('DATA TYPES'),
+              header: Text('EXPORT TYPE'),
               children:
-                  _dataTypes.map((s) => buildChoiceItem(s, ++_i1)).toList()),
-          CupertinoFormSection(
-              header: Text('FILE TYPES'),
-              children: _fileTypes
-                  .map((s) => buildChoiceItem(s, ++_i2, is2: true))
-                  .toList()),
+                  _dataTypes.map((s) => buildChoiceItem(s, ++_i)).toList()),
         ],
       )),
     );
   }
 
-  Widget buildChoiceItem(String text, int index, {bool is2 = false}) {
+  Widget buildChoiceItem(String text, int index) {
     return CupertinoFormRow(
         padding: EdgeInsets.only(left: 20),
         child: Row(children: [
           Expanded(
-            flex: 9,
+            flex: 4,
             child: CupertinoButton(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.zero,
+              pressedOpacity: 1.0,
               child: Text(
                 text,
                 style: TextStyle(
@@ -73,25 +98,29 @@ class _DataExportPageState extends State<DataExportPage> {
               ),
               onPressed: () {
                 setState(() {
-                  if (is2) {
-                    _index2 = index;
-                  } else {
-                    _index1 = index;
-                  }
+                  _index = index;
                 });
               },
             ),
           ),
           Expanded(
-              child: (is2 ? _index2 : _index1) == index
+              child: _index == index
                   ? CupertinoButton(
                       padding: EdgeInsets.zero,
+                      pressedOpacity: 1.0,
                       onPressed: () {},
                       child: Icon(
                         Icons.check_outlined,
                       ),
                     )
-                  : Text('')),
+                  : CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: Text(''),
+                      onPressed: () async {
+                        setState(() {
+                          _index = index;
+                        });
+                      })),
         ]));
   }
 }

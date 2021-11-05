@@ -19,6 +19,7 @@ class ConnectionPage extends StatefulWidget {
 class _ConnectionPageState extends State<ConnectionPage> {
   List<Connection> _connections = <Connection>[];
   List<String> _connectionPings = <String>[];
+
   @override
   void initState() {
     super.initState();
@@ -36,14 +37,14 @@ class _ConnectionPageState extends State<ConnectionPage> {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
                   return SettingsPage();
-                }));
+                })).then((a) async => refresh());
               }),
           trailing: GestureDetector(
             child: Icon(CupertinoIcons.add),
             onTap: () async => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (context) {
               return ConnectionAddPage();
-            })).then((value) async => refresh()),
+            })).then((value) => refresh()),
           ),
         ),
         child: ListView.builder(
@@ -130,14 +131,13 @@ class _ConnectionPageState extends State<ConnectionPage> {
   }
 
   Future<void> refresh() async {
-    setState(() {
-      var conns = SpUtil.getObjList(
-          Keys.connections, (map) => Connection.fromJson(map));
-      if (conns != null) {
-        _connections.clear();
-        _connections.addAll(conns);
-      }
-    });
+    var conns =
+        SpUtil.getObjList(Keys.connections, (map) => Connection.fromJson(map));
+    if (conns != null) {
+      _connections.clear();
+      _connections.addAll(conns);
+    }
+    setState(() {});
   }
 
   Future<void> edit(BuildContext context, int index) async {

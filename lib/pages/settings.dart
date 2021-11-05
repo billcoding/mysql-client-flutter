@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mailto/mailto.dart';
 import 'package:mysql_client_flutter/pages/data_export.dart';
 import 'package:mysql_client_flutter/pages/data_import.dart';
 import 'package:mysql_client_flutter/pages/snippet.dart';
@@ -25,8 +24,6 @@ class _SettingsPageState extends State<SettingsPage> {
             child: ListView(
           children: [
             CupertinoFormSection(header: Text('GENERAL'), children: [
-              buildCupertinoFormButtonRow('Theme', () {}),
-              buildCupertinoFormButtonRow('Font', () {}),
               buildCupertinoFormButtonRow('Snippets', () async {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
@@ -34,7 +31,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 }));
               }),
             ]),
-            CupertinoFormSection(header: Text('DATA TRANSFER'), children: [
+            CupertinoFormSection(header: Text('TRANSFER'), children: [
               buildCupertinoFormButtonRow('Import', () async {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
@@ -52,11 +49,11 @@ class _SettingsPageState extends State<SettingsPage> {
               header: Text('ABOUT'),
               children: [
                 buildCupertinoFormButtonRow(
-                    'Visit project', () async => await launch(repoURL)),
+                    'Visit Project', () async => await launch(repoURL)),
                 buildCupertinoFormButtonRow(
-                    'Request issue', () async => await launch(issuesURL)),
+                    'Request Issue', () async => await launch(issuesURL)),
                 buildCupertinoFormButtonRow(
-                    'Contact us', () async => await launch(mailTo)),
+                    'Contact Us', () async => await launch(mailTo)),
               ],
             ),
             CupertinoFormSection(

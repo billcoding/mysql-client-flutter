@@ -33,10 +33,10 @@ class _DataImportPageState extends State<DataImportPage> {
     _i = -1;
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text('Data Import'),
+        middle: Text('Import'),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Text('Import'),
+          child: Text('Browse'),
           onPressed: () async {
             var fr = await FilePicker.platform.pickFiles(
                 dialogTitle: 'Choose import file',
@@ -79,54 +79,6 @@ class _DataImportPageState extends State<DataImportPage> {
         ],
       )),
     );
-  }
-
-  void importConnections(String json) async {
-    var connections = <Connection>[];
-    (jsonDecode(json) as List).forEach((l) {
-      try {
-        connections.add(Connection.fromJson(l));
-      } catch (e) {}
-    });
-    if (connections.length > 0) {
-      if (switchValue) {
-        SpUtil.putObjectList(Keys.connections, connections);
-      } else {
-        var conns = SpUtil.getObjList(
-            Keys.connections, (map) => Connection.fromJson(map));
-        if (conns != null) {
-          conns.addAll(connections);
-          SpUtil.putObjectList(Keys.connections, conns);
-        }
-      }
-      showToast(context, 'Imported ${connections.length} connections success.');
-    } else {
-      showToast(context, 'Invalid data.');
-    }
-  }
-
-  void importSnippets(String json) async {
-    var snippets = <Snippet>[];
-    (jsonDecode(json) as List).forEach((l) {
-      try {
-        snippets.add(Snippet.fromJson(l));
-      } catch (e) {}
-    });
-    if (snippets.length > 0) {
-      if (switchValue) {
-        SpUtil.putObjectList(Keys.snippets, snippets);
-      } else {
-        var ss =
-            SpUtil.getObjList(Keys.snippets, (map) => Snippet.fromJson(map));
-        if (ss != null) {
-          ss.addAll(snippets);
-          SpUtil.putObjectList(Keys.snippets, ss);
-        }
-      }
-      showToast(context, 'Imported ${snippets.length} snippets success.');
-    } else {
-      showToast(context, 'Invalid data.');
-    }
   }
 
   Widget buildChoiceItem(String text, int index) {
@@ -186,5 +138,53 @@ class _DataImportPageState extends State<DataImportPage> {
                             });
                           })),
             ]));
+  }
+
+  void importConnections(String json) async {
+    var connections = <Connection>[];
+    (jsonDecode(json) as List).forEach((l) {
+      try {
+        connections.add(Connection.fromJson(l));
+      } catch (e) {}
+    });
+    if (connections.length > 0) {
+      if (switchValue) {
+        SpUtil.putObjectList(Keys.connections, connections);
+      } else {
+        var conns = SpUtil.getObjList(
+            Keys.connections, (map) => Connection.fromJson(map));
+        if (conns != null) {
+          conns.addAll(connections);
+          SpUtil.putObjectList(Keys.connections, conns);
+        }
+      }
+      showToast(context, 'Imported ${connections.length} connections.');
+    } else {
+      showToast(context, 'Invalid data.');
+    }
+  }
+
+  void importSnippets(String json) async {
+    var snippets = <Snippet>[];
+    (jsonDecode(json) as List).forEach((l) {
+      try {
+        snippets.add(Snippet.fromJson(l));
+      } catch (e) {}
+    });
+    if (snippets.length > 0) {
+      if (switchValue) {
+        SpUtil.putObjectList(Keys.snippets, snippets);
+      } else {
+        var ss =
+            SpUtil.getObjList(Keys.snippets, (map) => Snippet.fromJson(map));
+        if (ss != null) {
+          ss.addAll(snippets);
+          SpUtil.putObjectList(Keys.snippets, ss);
+        }
+      }
+      showToast(context, 'Imported ${snippets.length} snippets.');
+    } else {
+      showToast(context, 'Invalid data.');
+    }
   }
 }
