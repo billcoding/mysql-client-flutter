@@ -6,4 +6,4 @@ var issuesURL =
     'https://github.com/billcoding/mysql-client-flutter/issues/new?title=$emailSubjectEncode';
 var mailTo = 'mailto:$email?subject=$emailSubjectEncode';
 var version = '1.0.0';
-var copyright = '@billcoding, 2021';
+var copyright = '@billcoding 2021';

@@ -26,7 +26,7 @@ class _SnippetPageState extends State<SnippetPage> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            middle: Text('Snippets'),
+            middle: Text('Snippet'),
             trailing: GestureDetector(
               child: Icon(CupertinoIcons.add),
               onTap: () async => Navigator.of(context)
@@ -94,7 +94,7 @@ class _SnippetPageState extends State<SnippetPage> {
                                     .push(MaterialPageRoute(builder: (context) {
                                   return SnippetAddPage(
                                       snippet: Snippet(t.alias + '_copy',
-                                          t.remark + '_复制', t.body));
+                                          t.remark + '_copy', t.body));
                                 })).then((value) => refreshSnippets());
                               },
                               child: Icon(Icons.copy),

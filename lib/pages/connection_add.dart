@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
 import 'package:mysql_client_flutter/strings/keys.dart';
+import 'package:mysql_client_flutter/util/provider.dart';
 import 'package:mysql_client_flutter/util/toast.dart';
 import 'package:mysql_client_flutter/widgets/widget.dart';
 import 'package:sp_util/sp_util.dart';
@@ -127,20 +128,14 @@ class _ConnectionAddPageState extends State<ConnectionAddPage> {
       return;
     }
     var conn = createConnection();
-    if (SpUtil.containsKey(Keys.connections) ?? false) {
-      var conns = SpUtil.getObjList(
-              Keys.connections, (map) => Connection.fromJson(map)) ??
-          [];
-      if (widget.edit) {
-        // edit
-        conns[widget.index] = conn;
-      } else {
-        conns.add(conn);
-      }
-      SpUtil.putObjectList(Keys.connections, conns);
+    var conns = await loadConnections();
+    if (widget.edit) {
+      // edit
+      conns[widget.index] = conn;
     } else {
-      SpUtil.putObjectList(Keys.connections, [conn]);
+      conns.add(conn);
     }
+    await saveConnections(conns);
     showToast(context, 'Save success');
     _saveEnabled = true;
     Navigator.pop(context);

@@ -23,9 +23,9 @@ class _SnippetInfoPageState extends State<SnippetInfoPage> {
         child: SafeArea(
             child: ListView(children: [
           CupertinoFormSection(header: Text('SNIPPET Info.'), children: [
-            buildCupertinoFormInfoRow('Snippet Alias', widget.snippet.alias),
-            buildCupertinoFormInfoRow('Snippet Remark', widget.snippet.remark),
-            buildCupertinoFormInfoRow('Snippet Body', widget.snippet.body),
+            buildCupertinoFormInfoRow('Alias', widget.snippet.alias),
+            buildCupertinoFormInfoRow('Remark', widget.snippet.remark),
+            buildCupertinoFormInfoRow('Body', widget.snippet.body),
           ])
         ])));
   }

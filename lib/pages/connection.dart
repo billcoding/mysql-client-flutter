@@ -6,6 +6,7 @@ import 'package:mysql_client_flutter/pages/connection_add.dart';
 import 'package:mysql_client_flutter/pages/mysql.dart';
 import 'package:mysql_client_flutter/pages/settings.dart';
 import 'package:mysql_client_flutter/strings/keys.dart';
+import 'package:mysql_client_flutter/util/provider.dart';
 import 'package:sp_util/sp_util.dart';
 
 class ConnectionPage extends StatefulWidget {
@@ -131,12 +132,9 @@ class _ConnectionPageState extends State<ConnectionPage> {
   }
 
   Future<void> refresh() async {
-    var conns =
-        SpUtil.getObjList(Keys.connections, (map) => Connection.fromJson(map));
-    if (conns != null) {
-      _connections.clear();
-      _connections.addAll(conns);
-    }
+    var conns = await loadConnections();
+    _connections.clear();
+    _connections.addAll(conns);
     setState(() {});
   }
 
@@ -175,7 +173,7 @@ class _ConnectionPageState extends State<ConnectionPage> {
                     ),
                     onPressed: () async {
                       _connections.removeAt(index);
-                      SpUtil.putObjectList(Keys.connections, _connections);
+                      await saveConnections(_connections);
                       refresh();
                       Navigator.pop(context);
                     }),

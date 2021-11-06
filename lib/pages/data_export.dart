@@ -1,17 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:mysql_client_flutter/model/connection.dart';
-import 'package:mysql_client_flutter/model/snippet.dart';
-import 'package:mysql_client_flutter/strings/keys.dart';
-import 'package:mysql_client_flutter/util/toast.dart';
-import 'package:mysql_client_flutter/widgets/widget.dart';
+import 'package:mysql_client_flutter/util/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
-import 'package:sp_util/sp_util.dart';
 
 class DataExportPage extends StatefulWidget {
   const DataExportPage({Key? key}) : super(key: key);
@@ -46,15 +39,13 @@ class _DataExportPageState extends State<DataExportPage> {
             switch (_index) {
               case 0:
                 // Connection
-                json = jsonEncode(SpUtil.getObjList(
-                    Keys.connections, (map) => Connection.fromJson(map)));
+                json = jsonEncode(await loadConnections());
                 fileName = 'connections.json';
                 break;
               case 1:
                 // Snippet
                 // Connection
-                json = jsonEncode(SpUtil.getObjList(
-                    Keys.snippets, (map) => Snippet.fromJson(map)));
+                json = jsonEncode(await loadSnippets());
                 fileName = 'snippets.json';
                 break;
             }
