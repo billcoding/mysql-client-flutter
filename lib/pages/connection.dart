@@ -5,9 +5,7 @@ import 'package:mysql_client_flutter/model/connection.dart';
 import 'package:mysql_client_flutter/pages/connection_add.dart';
 import 'package:mysql_client_flutter/pages/mysql.dart';
 import 'package:mysql_client_flutter/pages/settings.dart';
-import 'package:mysql_client_flutter/strings/keys.dart';
 import 'package:mysql_client_flutter/util/provider.dart';
-import 'package:sp_util/sp_util.dart';
 
 class ConnectionPage extends StatefulWidget {
   ConnectionPage({

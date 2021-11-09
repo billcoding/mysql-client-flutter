@@ -2,11 +2,9 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql_client_flutter/model/connection.dart';
-import 'package:mysql_client_flutter/strings/keys.dart';
 import 'package:mysql_client_flutter/util/provider.dart';
 import 'package:mysql_client_flutter/util/toast.dart';
 import 'package:mysql_client_flutter/widgets/widget.dart';
-import 'package:sp_util/sp_util.dart';
 
 class ConnectionAddPage extends StatefulWidget {
   final Connection? conn;
