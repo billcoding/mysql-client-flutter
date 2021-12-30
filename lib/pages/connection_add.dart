@@ -126,7 +126,8 @@ class _ConnectionAddPageState extends State<ConnectionAddPage> {
       return;
     }
     var conn = createConnection();
-    var conns = await loadConnections();
+    var conns = <Connection>[];
+    conns.addAll(await loadConnections());
     if (widget.edit) {
       // edit
       conns[widget.index] = conn;
