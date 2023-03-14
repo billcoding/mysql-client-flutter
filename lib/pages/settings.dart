@@ -49,11 +49,11 @@ class _SettingsPageState extends State<SettingsPage> {
               header: Text('ABOUT'),
               children: [
                 buildCupertinoFormButtonRow(
-                    'Visit Project', () async => await launch(repoURL)),
+                    'Visit Project', () async => await launchUrl(repoURL)),
                 buildCupertinoFormButtonRow(
-                    'Request Issue', () async => await launch(issuesURL)),
+                    'Request Issue', () async => await launchUrl(issuesURL)),
                 buildCupertinoFormButtonRow(
-                    'Contact Us', () async => await launch(mailTo)),
+                    'Contact Us', () async => await launchUrl(mailTo)),
               ],
             ),
             CupertinoFormSection(
