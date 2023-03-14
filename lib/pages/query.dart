@@ -110,7 +110,7 @@ class _QueryPageState extends State<QueryPage> {
         ));
   }
 
-  Widget buildTableCell(String text, {textAlign: TextAlign.center}) {
+  Widget buildTableCell(String text, {textAlign = TextAlign.center}) {
     return TableCell(
         child: Text(
       text,
